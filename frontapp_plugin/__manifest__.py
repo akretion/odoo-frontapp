@@ -3,13 +3,14 @@
 
 {
     "name": "Frontapp Plugin",
-    "description": """
+    "summary": """
         Plugin for FrontApp CRM""",
     "version": "14.0.1.0.0",
     "license": "LGPL-3",
-    "author": "Akretion",
+    "authors": "Akretion, Odoo Community Association (OCA)",
     "website": "https://github.com/akretion/odoo-frontapp",
     "depends": ["crm"],
+    "maintainers": ["rvalyi"],
     "data": [
         "data/mail_data.xml",
         "views/assets_template.xml",
