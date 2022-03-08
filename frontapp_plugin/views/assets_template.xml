@@ -3,58 +3,92 @@
      License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
 <odoo>
   <template id="frontapp_plugin.assets_web-light" name="Lightweight Web Assets">
-    <script type="text/javascript" src="/web/static/lib/owl/owl.js"></script>
+    <script type="text/javascript" src="/web/static/lib/owl/owl.js" />
 
     <!-- then min deps to load Odoo core/rpc.js -->
-    <script type="text/javascript" src="/web/static/lib/es6-promise/es6-promise-polyfill.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
-    <script type="text/javascript" src="/web/static/src/js/promise_extension.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
-    <script type="text/javascript" src="/web/static/src/js/boot.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
-    <script type="text/javascript" src="/web/static/lib/underscore/underscore.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
-    <script type="text/javascript" src="/web/static/lib/underscore.string/lib/underscore.string.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
-    <script type="text/javascript" src="/web/static/lib/moment/moment.js" data-asset-xmlid="web.assets_common" data-asset-version="92e7445"></script>
+    <script
+            type="text/javascript"
+            src="/web/static/lib/es6-promise/es6-promise-polyfill.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
+    <script
+            type="text/javascript"
+            src="/web/static/src/js/promise_extension.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
+    <script
+            type="text/javascript"
+            src="/web/static/src/js/boot.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
+    <script
+            type="text/javascript"
+            src="/web/static/lib/underscore/underscore.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
+    <script
+            type="text/javascript"
+            src="/web/static/lib/underscore.string/lib/underscore.string.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
+    <script
+            type="text/javascript"
+            src="/web/static/lib/moment/moment.js"
+            data-asset-xmlid="web.assets_common"
+            data-asset-version="92e7445"
+        />
 
-    <script type="text/javascript" src="/web/static/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/web/static/lib/jquery/jquery.js" />
 
-    <script type="text/javascript" src="/web/static/src/js/core/class.js"></script>
-    <script type="text/javascript" src="/web/static/src/js/core/translation.js"></script>
-    <script type="text/javascript" src="/web/static/src/js/core/utils.js"></script>
-    <script type="text/javascript" src="/web/static/src/js/core/mixins.js"></script>
+    <script type="text/javascript" src="/web/static/src/js/core/class.js" />
+    <script type="text/javascript" src="/web/static/src/js/core/translation.js" />
+    <script type="text/javascript" src="/web/static/src/js/core/utils.js" />
+    <script type="text/javascript" src="/web/static/src/js/core/mixins.js" />
     <!-- <script type="text/javascript" src="/web/static/src/js/core/registry.js"></script> -->
-    <script type="text/javascript" src="/web/static/src/js/core/time.js"></script>
+    <script type="text/javascript" src="/web/static/src/js/core/time.js" />
     <!-- <script type="text/javascript" src="/web/static/lib/qweb/qweb2.js"></script>
     <script type="text/javascript" src="/web/static/src/js/core/qweb.js"></script> -->
-    <script type="text/javascript" src="/web/static/src/js/core/bus.js"></script>
+    <script type="text/javascript" src="/web/static/src/js/core/bus.js" />
     <!-- <script type="text/javascript" src="/web/static/src/js/services/config.js"></script>
     <script type="text/javascript" src="/web/static/src/js/services/core.js"></script>
     <script type="text/javascript" src="/web/static/src/js/core/ajax.js"></script> -->
 
-    <script type="module" src="/frontapp_plugin/static/src/js/jsonrpc.js"></script>
+    <script type="module" src="/frontapp_plugin/static/src/js/jsonrpc.js" />
   </template>
 
   <template id="frontapp_plugin.assets_frontapp" name="Frontapp plugin UI Assets">
-    <link rel="stylesheet" type="text/css" href="/frontapp_plugin/static/src/css/index.css" />
     <link
-        rel="stylesheet"
-        type="text/css"
-        href="/frontapp_plugin/static/src/css/app.css"
-    />
+            rel="stylesheet"
+            type="text/css"
+            href="/frontapp_plugin/static/src/css/index.css"
+        />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="/frontapp_plugin/static/src/css/app.css"
+        />
       <!-- install FrontApp SDK with: npm i @frontapp/plugin-sdk -->
       <!-- then package it with npm run build:js -->
-      <script type="text/javascript" src="/frontapp_plugin/static/dist/frontapp-plugin-sdk.js" />
+      <script
+            type="text/javascript"
+            src="/frontapp_plugin/static/dist/frontapp-plugin-sdk.js"
+        />
       <script type="text/javascript" src="/frontapp_plugin/static/src/js/app.js" />
   </template>
 
   <!-- Load backend css -->
   <template
-      id="assets_backend"
-      name="frontapp_plugin assets"
-      inherit_id="web.assets_backend"
-  >
+        id="assets_backend"
+        name="frontapp_plugin assets"
+        inherit_id="web.assets_backend"
+    >
       <xpath expr="." position="inside">
-          <link
-              rel="stylesheet"
-              href="/frontapp_plugin/static/src/css/backend.css"
-          />
+          <link rel="stylesheet" href="/frontapp_plugin/static/src/css/backend.css" />
       </xpath>
   </template>
 </odoo>

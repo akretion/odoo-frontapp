@@ -1,8 +1,8 @@
-from odoo import fields, models
+from odoo import models
 
 
 class MailMail(models.Model):
-    _inherit = 'mail.mail'
+    _inherit = "mail.mail"
 
     def _send(self, auto_commit=False, raise_exception=False, smtp_session=None):
         """
@@ -19,6 +19,8 @@ class MailMail(models.Model):
                     and mail.mail_message_id.subtype_id.name == "Note"
                 ):
                     mail.subject += " #%s" % (mail.id,)
-            except Exception as e:
+            except Exception:
                 pass
-        return super()._send(auto_commit=False, raise_exception=False, smtp_session=None)
+        return super()._send(
+            auto_commit=False, raise_exception=False, smtp_session=None
+        )

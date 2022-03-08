@@ -5,7 +5,6 @@ from odoo.http import Controller, request, route
 
 
 class FrontappPluginController(Controller):
-
     @route(
         ["/frontapp-plugin"],
         methods=["GET"],
@@ -13,5 +12,5 @@ class FrontappPluginController(Controller):
         auth="public",
     )
     def index(self, **params):
-        odoo_server = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        request.env["ir.config_parameter"].sudo().get_param("web.base.url")
         return request.render("frontapp_plugin.frontapp-plugin", {})

@@ -1,11 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <odoo>
     <data>
         <!-- CRM-related subtypes for messaging / Chatter -->
         <record id="frontapp_conversation_link" model="mail.message.subtype">
             <field name="name">FrontApp Conversation Link</field>
             <field name="res_model">res.partner</field>
-            <field name="default" eval="False"/>
+            <field name="default" eval="False" />
             <field name="description">FrontApp Conversation Link</field>
         </record>
     </data>

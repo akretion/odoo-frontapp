@@ -8,7 +8,7 @@
     "version": "14.0.1.0.0",
     "license": "LGPL-3",
     "author": "Akretion",
-    "website": "akretion.com",
+    "website": "https://github.com/akretion/odoo-frontapp",
     "depends": ["crm"],
     "data": [
         "data/mail_data.xml",
