@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="frontapp_plugin.frontapp-plugin" name="FrontApp Plugin">
+        <t t-call="web.layout">
+
+            <!--script id="web.layout.odooscript" type="text/javascript">
+                var odoo_server = "<t t-esc="odoo_server"/>";
+                var odoo_partner_menu = "<t t-esc="odoo_partner_menu"/>";
+                var odoo_partner_action = "<t t-esc="odoo_partner_action"/>";
+                var odoo_lead_menu = "<t t-esc="odoo_lead_menu"/>";
+                var odoo_lead_action = "<t t-esc="odoo_lead_action"/>";
+            </script-->
+
+            <t t-set="head">
+                <t t-call-assets="frontapp_plugin.assets_frontapp" t-js="false" />
+                <t t-call-assets="frontapp_plugin.assets_web-light" t-css="false" />
+                <t t-call-assets="frontapp_plugin.assets_frontapp" t-css="false" />
+            </t>
+            <t t-set="head" t-value="head" />
+        </t>
+
+        <body>
+
+        </body>
+    </template>
+</odoo>

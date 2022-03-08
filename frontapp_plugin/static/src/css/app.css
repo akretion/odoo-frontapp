@@ -1,0 +1,83 @@
+.frontapp-odoo {
+  width: 300px;
+  margin: 50px auto;
+  background: aliceblue;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.frontapp-odoo > input {
+  display: block;
+  margin: auto;
+}
+
+.contact-list {
+  margin-top: 8px;
+}
+
+.contact {
+  font-size: 14px;
+  color: #111111;
+  display: block;
+  grid-template-columns: 30px auto 30px;
+  opacity: 0.5;
+}
+.contact label {
+  text-decoration: line-through;
+}
+
+.contact:hover {
+  background-color: #def0ff;
+}
+
+.contact > input {
+  margin: auto;
+}
+
+div.contact-info {
+  font-size: 18px;
+}
+
+.delete {
+  opacity: 0;
+  cursor: pointer;
+  text-align: center;
+}
+
+.contact:hover .delete {
+  opacity: 1;
+}
+
+.contact.linked {
+  opacity: 1;
+  text-decoration: none;
+}
+.contact.linked label {
+  text-decoration: none;
+}
+
+.contact-panel {
+  color: #0088ff;
+  margin-top: 8px;
+  font-size: 14px;
+  display: flex;
+}
+
+.contact-panel .contact-counter {
+  flex-grow: 1;
+}
+
+.contact-panel span {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.contact-panel span.active {
+  font-weight: bold;
+}
+
+.opportunity-list {
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
