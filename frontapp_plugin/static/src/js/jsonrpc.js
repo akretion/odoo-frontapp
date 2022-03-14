@@ -40,7 +40,9 @@ function _genericJsonRpc (fct_name, params, settings, fct) {
                     "Error data message:\n", result.error.data.message, "\n",
                     "Error data debug:\n", result.error.data.debug
                 );
-                // TODO catch + alert odoo.http.SessionExpiredException: Session expired
+                if (result.error.message == "Odoo Session Expired") {
+                  alert("You should login in Odoo to get the Odoo Frontapp plugin to work!");
+                }
             }
             return Promise.reject({type: "server", error: result.error});
         } else {
@@ -137,7 +139,6 @@ function jsonRpc(url, fct_name, params, settings) {
 function rpc(url, params, settings) {
     return jsonRpc(url, 'call', params, settings);
 }
-console.log("here")
 
 _.extend(simple_ajax, {
     jsonRpc: jsonRpc,
