@@ -72,6 +72,11 @@
             type="text/css"
             href="/frontapp_plugin/static/src/css/app.css"
         />
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="/web/static/lib/fontawesome/css/font-awesome.css"
+        />
       <!-- install FrontApp SDK with: npm i @frontapp/plugin-sdk -->
       <!-- then package it with npm run build:js -->
       <script
@@ -88,7 +93,7 @@
         inherit_id="web.assets_backend"
     >
       <xpath expr="." position="inside">
-          <link rel="stylesheet" href="/frontapp_plugin/static/src/css/backend.css" />
+          <link rel="stylesheet" type="text/css" href="/frontapp_plugin/static/src/css/backend.css" />
       </xpath>
   </template>
 </odoo>
