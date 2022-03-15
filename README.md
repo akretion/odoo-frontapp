@@ -3,9 +3,10 @@
 ## Introduction
 
 It's inspired from [the FrontApp demo plugin](https://github.com/frontapp/front-plugin-demo)
-but it's developped using Odoo [OWL](https://github.com/odoo/owl) framework for an Akretion customer.
+but it's developped using Odoo [OWL](https://github.com/odoo/owl) framework. This plugin is resonably generic
+but in fact it was done for an Akretion customer for which a few things are overriden in an extra module.
 
-it's rather simple. Features include:
+This generic module is rather simple. Features include:
 
 * searching (by email) for Odoo contacts related to the selected FrontApp conversation
 * enabling to explicitely link an Odoo contact to a given FrontApp conversation
@@ -14,13 +15,18 @@ it's rather simple. Features include:
 * listing the last Odoo contact chatter notes
 * inside Odoo you have links back to the linked FrontApp conversations
 
+The authentication is simple: you need to be logged in your Odoo in your browser to be able to use the FrontApp Odoo plugin. The Odoo session
+cookie is in fact reused in the plugin iframe that is itself hosted on your Odoo server.
+
 
 ## Testing it
 
-You can test it easily with an Odoo database with demo data and point your browser to `http://localhost:8069/frontapp-plugin`. The linked demo contacts are not linked to a
+You can test it easily with an Odoo database with demo data and point your browser to `http://localhost:8069/frontapp-plugin`. The linked demo contacts are not linked to any
 specific FrontApp conversation but you can have an idea how it works. This way of testing is handy for developping or extending the plugin.
 
 If instead you want to test it with FrontApp you need a **developper FrontApp account**. You need to host your Odoo on a public **HTTPS** URL.
+**You should also have your HTTPS proxy properly configured to allow sharing the Odoo session cookie inside the FrontApp plugin iframe.**
+On Ngnix this is typically achieved using this header `proxy_cookie_path / "/; secure; HttpOnly; SameSite=None";`
 Now create a new plugin in your FrontApp developper panel with the HTPPS server and the `/frontapp-plugin` path.
 You should now be able to activate the Odoo plugin on the right side panel in FrontApp.
 Finally browse some FrontApp conversation and see what happen in the Odoo side panel. Contacts will be searched by
@@ -28,7 +34,7 @@ their email, if no email is matched you can still search for a contact by name o
 
 ## Caveats
 
-* The plugin has been made for Odoo 14 which doesn't play very well with Javascript ES6 modules (it's better on more recent versions).
+* The plugin has been made for Odoo 14 which doesn't play very well with Javascript ES6 modules (it will be better on more recent Odoo versions).
 And the FrontApp plugin SDK is now an ES6 npm package. So what I did was packaging the FrontApp SDK using a [package.json npm file](https://github.com/akretion/odoo-frontapp/blob/14.0/frontapp_plugin/static/package.json)
 To be build with npm using [this webpack.config.js file](https://github.com/akretion/odoo-frontapp/blob/14.0/frontapp_plugin/static/webpack.config.js).
 And finally this [file makes the bridge](https://github.com/akretion/odoo-frontapp/blob/14.0/frontapp_plugin/static/src/js/frontapp_es6_bridge.js) with the non ES6 Odoo world.
