@@ -73,6 +73,8 @@ odoo.define("web.frontapp", function (require) {
                     )
                     .then(function (contacts) {
                         contact.isLinked = true;
+                        var input =  document.getElementById('opp_input_' + id);
+                        input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
                         contacts.forEach((contact, i) => {

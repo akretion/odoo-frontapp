@@ -1,4 +1,4 @@
-from odoo import api, models
+from odoo import api, fields, models
 
 PARTNER_LIMIT = 10
 LEAD_LIMIT = 5
@@ -6,6 +6,9 @@ LAST_CONVERSATIONS_COUNT = 3
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
+
+    created_from_frontapp = fields.Boolean()
+    # TODO FrontApp m2m computed links
 
     @api.model
     def _get_frontapp_partner_fields(self):
@@ -131,7 +134,16 @@ class ResPartner(models.Model):
 
     @api.model
     def create_contact_from_frontapp(self, name, frontapp_context):
-        partner = super().create({"name": name}) # TODO use frontapp_context
+        if not frontapp_context:
+            frontapp_context = {"conversation": {}}  # useful for local testing
+        partner_data = {
+            "name": name,
+            "created_from_frontapp": True,
+            "company_type": "person",
+        }
+        if frontapp_context["conversation"].get("assignee"):
+            partner_data["email"] = frontapp_context["conversation"]["assignee"].get("email")
+        partner = super().create(partner_data)
         partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
 
@@ -194,6 +206,7 @@ class ResPartner(models.Model):
             opp = self.env["crm.lead"].create({
                 "name": name,
                 "partner_id": partner.id,
+                "created_from_frontapp": True,
             })
             partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
