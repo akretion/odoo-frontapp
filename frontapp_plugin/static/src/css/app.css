@@ -23,7 +23,7 @@
     border: 2px solid rgb(54, 127, 238);
     border-radius: 8px;
     padding-top: 10px;
-    padding-bottom: 0px;
+    padding-bottom: 5px;
     padding-left: 25px;
     padding-right: 25px;
     margin: 5px;
@@ -90,4 +90,8 @@ div.contact-info {
 
 .pl-1 {
     padding-left: 0.25rem;
+}
+
+.ml-1 {
+    margin-left: 10px;
 }

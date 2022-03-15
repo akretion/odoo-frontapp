@@ -129,6 +129,12 @@ class ResPartner(models.Model):
                 partner["isLinked"] = True
         return partner_records
 
+    @api.model
+    def create_contact_from_frontapp(self, name, frontapp_context):
+        partner = super().create({"name": name}) # TODO use frontapp_context
+        partner.toggle_contact_link(True, frontapp_context)
+        return self.search_from_frontapp([], False, frontapp_context)
+
     def _frontapp_conversations(self, partner_ids, conversation_key=False):
         domain = [
             ("model", "=", "res.partner"),
@@ -180,3 +186,14 @@ class ResPartner(models.Model):
             else:
                 existing_links.unlink()
         return True
+
+    def create_contact_opportunity(self, name, frontapp_context):
+        if not frontapp_context:
+            frontapp_context = {"conversation": {}}  # useful for local testing
+        for partner in self:
+            opp = self.env["crm.lead"].create({
+                "name": name,
+                "partner_id": partner.id,
+            })
+            partner.toggle_contact_link(True, frontapp_context)
+        return self.search_from_frontapp([], False, frontapp_context)

@@ -14,14 +14,13 @@ odoo.define("web.frontapp", function (require) {
         // -------------------------------------------------------------------------
         const actions = {
             addContact({state}, contact) {
-                console.log("ADD CONTACT", contact);
+                //console.log("ADD CONTACT", contact);
                 if (contact) {
                     state.contacts.push(contact);
                 }
             },
             toggleContactLink({state}, id) {
-                const contact = state.contacts.find((t) => t.id === id);
-                //contact.isLinked = !contact.isLinked;
+                var contact = state.contacts.find((t) => t.id === id);
                 simple_ajax
                     .jsonRpc(
                         "/web/dataset/call_kw/res.partner",
@@ -51,6 +50,38 @@ odoo.define("web.frontapp", function (require) {
             },
             resetContacts({state}, id) {
                 state.contacts = [];
+            },
+            createOpportunity({state}, id) {
+                var contact = state.contacts.find((t) => t.id === id);
+                var input =  document.getElementById('opp_input_' + id);
+                var name = input.value;
+                simple_ajax
+                    .jsonRpc(
+                        "/web/dataset/call_kw/res.partner",
+                        "call",
+                        {
+                            model: "res.partner",
+                            method: "create_contact_opportunity",
+                            args: [
+                                [contact.id],
+                                name,
+                                state.frontappContext,
+                            ],
+                            kwargs: {context: {}},
+                        },
+                        {headers: {}}
+                    )
+                    .then(function (contacts) {
+                        contact.isLinked = true;
+                        var app = window.odoo_app;
+                        app.dispatch("resetContacts");
+                        contacts.forEach((contact, i) => {
+                            app.dispatch("addContact", contact);
+                        });
+                    })
+                    .guardedCatch(function () {
+                        console.log("create_contact_opportunity KO!", this);
+                    });
             },
             setFrontappContext({state}, context) {
                 state.frontappContext = context;
@@ -149,6 +180,10 @@ odoo.define("web.frontapp", function (require) {
         <div class="opportunity-list">
             <Opportunity t-foreach="props.contact.opportunities" t-as="opportunity" t-key="opportunity.id" opportunity="opportunity"/>
         </div>
+        <div>
+          <i class="fa fa-save" t-on-click="dispatch('createOpportunity', props.contact.id)"/>
+          <input class="ml-1" placeholder="create Opportunity" t-att-id="'opp_input_' + props.contact.id"/>
+        </div>
     </div>`;
 
         class Contact extends Component {
@@ -184,8 +219,16 @@ odoo.define("web.frontapp", function (require) {
             </div>
         </div>
         <div>
-        <i class="fa fa-search" />
-        <input placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
+          <i class="fa fa-search" t-on-click="searchContact" />
+          <input placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
+        </div>
+        <div>
+          <i class="fa fa-save" t-on-click="createContact" />
+          <span class="pl-1" t-on-click="createContact" >Create as Odoo Contact (FirstName LastName)</span>
+        </div>
+        <div>
+          <i class="fa fa-save" t-on-click="createCompany" />
+          <span class="pl-1" t-on-click="createCompany" >Create as Odoo Company</span>
         </div>
     </div>`;
 
@@ -213,10 +256,16 @@ odoo.define("web.frontapp", function (require) {
                 }
             }
 
+            createContact(ev) {
+                console.log(this.inputRef.el.value);
+                createOdooContact(this.state.frontappContext, this.inputRef.el.value);
+                this.inputRef.el.value = "";
+            }
+
             searchContact(ev) {
                 // 13 is keycode for ENTER
-                if (ev.keyCode === 13) {
-                    loadContacts([], {}, ev.target.value);
+                if (ev.keyCode === 13 || !ev.keyCode) {
+                    loadContacts([], this.state.frontappContext, this.inputRef.el.value);
                     ev.target.value = "";
                 }
             }
@@ -229,6 +278,7 @@ odoo.define("web.frontapp", function (require) {
                         return this.contacts;
                 }
             }
+
             setFilter(filter) {
                 this.filter.value = filter;
             }
@@ -269,7 +319,7 @@ odoo.define("web.frontapp", function (require) {
         function loadContacts(contact_emails, frontappContext, search_param) {
             console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
-            if (typeof frontappContext.conversation !== "undefined") {
+            if (frontappContext && typeof frontappContext.conversation !== "undefined") {
                 app.dispatch("setFrontappContext", frontappContext);
             }
             simple_ajax
@@ -283,7 +333,32 @@ odoo.define("web.frontapp", function (require) {
                         kwargs: {},
                     },
                     {headers: {}}
-                    // TODO inject conversation ID to find out if contacts related to conversation or not
+                )
+                .then(function (contacts) {
+                    //console.log("contact promise resolved!", contacts);
+                    app.dispatch("resetContacts");
+                    contacts.forEach((contact, i) => {
+                        app.dispatch("addContact", contact);
+                    });
+                })
+                .guardedCatch(function () {
+                    console.log("contact search KO!", this);
+                });
+        }
+
+        function createOdooContact(frontappContext, name) {
+            var app = window.odoo_app;
+            simple_ajax
+                .jsonRpc(
+                    "/web/dataset/call_kw/res.partner",
+                    "call",
+                    {
+                        model: "res.partner",
+                        method: "create_contact_from_frontapp",
+                        args: [name, frontappContext],
+                        kwargs: {},
+                    },
+                    {headers: {}}
                 )
                 .then(function (contacts) {
                     console.log("contact promise resolved!", contacts);
@@ -293,7 +368,7 @@ odoo.define("web.frontapp", function (require) {
                     });
                 })
                 .guardedCatch(function () {
-                    console.log("contact search KO!", this);
+                    console.log("create contact KO!", this);
                 });
         }
 
