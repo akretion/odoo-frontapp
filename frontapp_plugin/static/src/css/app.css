@@ -1,20 +1,16 @@
 .frontapp-odoo {
     width: 300px;
     margin: 50px auto;
-    background: aliceblue;
-    padding: 10px;
     display: flex;
     flex-direction: column;
 }
 
-.frontapp-odoo > input {
-    display: block;
-    margin: auto;
+.frontapp-odoo > div> input {
+    margin-left: 10px;
+    width: 260px;
 }
 
 .contact-list {
-    margin-top: 8px;
-    padding-left: 20px;
 }
 
 .contact {
@@ -23,6 +19,14 @@
     display: block;
     grid-template-columns: 30px auto 30px;
     opacity: 0.5;
+    box-shadow: rgb(0 0 0 / 4%) 0px 1px 1px;
+    border: 2px solid rgb(54, 127, 238);
+    border-radius: 8px;
+    padding-top: 10px;
+    padding-bottom: 0px;
+    padding-left: 25px;
+    padding-right: 25px;
+    margin: 5px;
 }
 .contact label {
     text-decoration: line-through;

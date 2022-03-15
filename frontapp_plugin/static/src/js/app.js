@@ -175,14 +175,18 @@ odoo.define("web.frontapp", function (require) {
                 contact(s)
             </div-->
             <div>
-                <span t-foreach="['all', 'linked']"
+                <i class="fa fa-filter" />
+                <span class="pl-1" t-foreach="['all', 'linked']"
                     t-as="f" t-key="f"
                     t-att-class="{active: filter.value===f}"
                     t-on-click="setFilter(f)"
                     t-esc="f"/>
             </div>
         </div>
+        <div>
+        <i class="fa fa-search" />
         <input placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
+        </div>
     </div>`;
 
         class App extends Component {
