@@ -31,7 +31,6 @@ function _genericJsonRpc (fct_name, params, settings, fct) {
     var xhr = fct(data);
     var result = xhr.then(function(result) {
         bus.trigger('rpc:result', data, result);
-        $('#error')[0].innerHTML = "";
         if (result.error !== undefined) {
             if (result.error.data.arguments[0] !== "bus.Bus not available in test mode") {
                 console.debug(

@@ -286,7 +286,7 @@ odoo.define("web.frontapp", function (require) {
           <button>
             <i class="fa fa-search" t-on-click="searchContact" />
           </button>
-          <input placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
+          <input id="search_input" placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
         </div>
         <div>
           <button t-on-click="createContact">
@@ -312,6 +312,7 @@ odoo.define("web.frontapp", function (require) {
             </div>
         </div>
         <div id="error"></div>
+        <div id="info"></div>
         <div class="contact-list">
             <Contact t-foreach="displayedContacts" t-as="contact" t-key="contact.id" contact="contact"/>
         </div>
@@ -395,7 +396,7 @@ odoo.define("web.frontapp", function (require) {
         }
 
         function setup() {
-            owl.config.mode = "dev";
+            owl.config.mode = "prod";
             const env = {store: makeStore()};
             mount(App, {target: document.body, env}).then((app) => {
                 window.odoo_app = app;
@@ -414,8 +415,10 @@ odoo.define("web.frontapp", function (require) {
         function loadContacts(contact_emails, frontappContext, search_param) {
             //console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
-            if (frontappContext && frontappContext.conversation) {
+            if (frontappContext && frontappContext.conversation && frontappContext.conversation.subject !== undefined) {
                 app.dispatch("setFrontappContext", frontappContext);
+            } else {
+                $('#error')[0].innerHTML = "Warning no FrontApp Conversion found!<br/>You might try select a conversation or try to refresh your browser using F5 if the problem persists."
             }
             simple_ajax
                 .jsonRpc(
@@ -432,6 +435,12 @@ odoo.define("web.frontapp", function (require) {
                 .then(function (contacts) {
                     //console.log("contact promise resolved!", contacts);
                     app.dispatch("resetContacts");
+                    if (contacts.length > 0) {
+                      $('#info')[0].innerHTML = "";
+                      $('#error')[0].innerHTML = "";
+                    } else {
+                      $('#info')[0].innerHTML = "No contact matching this conversation!<br/>You can search for a contact (by name or email) and link it to the conversation.<br/>Or you can also create a new Odoo contact or company.";
+                    }
                     contacts.forEach((contact, i) => {
                         app.dispatch("addContact", contact);
                     });
@@ -477,6 +486,8 @@ odoo.define("web.frontapp", function (require) {
                         context.conversation.assignee.email,
                         context.conversation.recipient.handle,
                     ];
+                    $('#search_input')[0].value="";
+                    $('#error')[0].innerHTML = "";
                     loadContacts(contacts, context);
                     break;
                 case "multiConversations":
