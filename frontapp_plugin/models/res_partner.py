@@ -133,13 +133,13 @@ class ResPartner(models.Model):
         return partner_records
 
     @api.model
-    def create_contact_from_frontapp(self, name, frontapp_context):
+    def create_contact_from_frontapp(self, name, frontapp_context, company_type):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         partner_data = {
             "name": name,
             "created_from_frontapp": True,
-            "company_type": "person",
+            "company_type": company_type,
         }
         if frontapp_context["conversation"].get("assignee"):
             partner_data["email"] = frontapp_context["conversation"]["assignee"].get("email")
