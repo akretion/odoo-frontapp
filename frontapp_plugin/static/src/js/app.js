@@ -14,7 +14,7 @@ odoo.define("web.frontapp", function (require) {
         // -------------------------------------------------------------------------
         const actions = {
             addContact({state}, contact) {
-                //console.log("ADD CONTACT", contact);
+                console.log("ADD CONTACT", contact);
                 if (contact) {
                     state.contacts.push(contact);
                 }
@@ -85,6 +85,42 @@ odoo.define("web.frontapp", function (require) {
                         console.log("create_contact_opportunity KO!", this);
                     });
             },
+            createNote({state}, id) {
+                console.log("create note", id)
+                var contact = state.contacts.find((t) => t.id === id);
+                var input =  document.getElementById('note_input_' + id);
+                var body = input.value;
+                console.log("create note", body)
+                simple_ajax
+                    .jsonRpc(
+                        "/web/dataset/call_kw/res.partner",
+                        "call",
+                        {
+                            model: "res.partner",
+                            method: "create_contact_note",
+                            args: [
+                                [contact.id],
+                                body,
+                                state.frontappContext,
+                            ],
+                            kwargs: {context: {}},
+                        },
+                        {headers: {}}
+                    )
+                    .then(function (contacts) {
+                        contact.isLinked = true;
+                        var input =  document.getElementById('note_input_' + id);
+                        input.value = "";
+                        var app = window.odoo_app;
+                        app.dispatch("resetContacts");
+                        contacts.forEach((contact, i) => {
+                            app.dispatch("addContact", contact);
+                        });
+                    })
+                    .guardedCatch(function () {
+                        console.log("create_contact_note KO!", this);
+                    });
+            },
             setFrontappContext({state}, context) {
                 state.frontappContext = context;
             },
@@ -96,6 +132,24 @@ odoo.define("web.frontapp", function (require) {
             contacts: [],
             frontappContext: {conversation: {id: "no_conversation"}},
         };
+
+        // -------------------------------------------------------------------------
+        // Note Component
+        // -------------------------------------------------------------------------
+        const NOTE_TEMPLATE = xml`
+    <div class="note">
+      <i class="fa fa-comment" />
+      <span class="note-date" ><t t-esc="props.note.date"/></span>
+      <span class="note-author" ><t t-esc="props.note.author"/></span>
+      <div class="ml-1" ><t t-esc="props.note.subject"/></div>
+      <div class="ml-1" ><t t-raw="props.note.body"/></div>
+    </div>`;
+
+        class Note extends Component {
+            static template = NOTE_TEMPLATE;
+            static props = ["note"];
+            dispatch = useDispatch();
+        }
 
         // -------------------------------------------------------------------------
         // Opportunity Component
@@ -179,21 +233,39 @@ odoo.define("web.frontapp", function (require) {
             <t t-esc="props.contact.user_id[1]" />
           </span>
         </div>
+        <div t-if="props.contact.privileged_distrib_id" >
+          <!-- FIXME this is a customer specific field -->
+          <i class="fa fa-industry" />
+          <span class="pl-1">
+            <t t-esc="props.contact.privileged_distrib_id[1]" />
+          </span>
+        </div>
+
         <div class="opportunity-list">
             <Opportunity t-foreach="props.contact.opportunities" t-as="opportunity" t-key="opportunity.id" opportunity="opportunity"/>
         </div>
-        <div>
+        <div class="opportunity-create">
           <button t-on-click="dispatch('createOpportunity', props.contact.id)" >
             <i class="fa fa-save"/>
           </button>
           <input class="ml-1" placeholder="create Opportunity" t-att-id="'opp_input_' + props.contact.id"/>
+        </div>
+
+        <div class="note-list">
+            <Note t-foreach="props.contact.other_conversations" t-as="note" t-key="note.id" note="note"/>
+        </div>
+        <div class="note-create">
+          <button t-on-click="dispatch('createNote', props.contact.id)" >
+            <i class="fa fa-save"/>
+          </button>
+          <textarea class="ml-1" placeholder="create Note" t-att-id="'note_input_' + props.contact.id"/>
         </div>
     </div>`;
 
         class Contact extends Component {
             static template = CONTACT_TEMPLATE;
             static props = ["contact"];
-            static components = {Opportunity};
+            static components = {Opportunity, Note};
             dispatch = useDispatch();
         }
 
@@ -316,7 +388,6 @@ odoo.define("web.frontapp", function (require) {
             const env = {store: makeStore()};
             mount(App, {target: document.body, env}).then((app) => {
                 window.odoo_app = app;
-                console.log(app);
                 // TODO FIXME: useful for testing:
                 loadContacts(
                     [
@@ -374,7 +445,6 @@ odoo.define("web.frontapp", function (require) {
                     {headers: {}}
                 )
                 .then(function (contacts) {
-                    console.log("contact promise resolved!", contacts);
                     app.dispatch("resetContacts");
                     contacts.forEach((contact, i) => {
                         app.dispatch("addContact", contact);

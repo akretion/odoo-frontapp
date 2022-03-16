@@ -25,8 +25,8 @@
     border-radius: 8px;
     padding-top: 10px;
     padding-bottom: 5px;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-left: 20px;
+    padding-right: 20px;
     margin: 5px;
 }
 .contact label {
@@ -84,9 +84,31 @@ div.contact-info {
     font-weight: bold;
 }
 
+.note-list {
+    margin-top: 20px;
+}
+
+.note-date {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.note-author {
+}
+
+.note-create textarea {
+    margin-top: 10px;
+    margin-bottom: -5px;
+    width: 202px;
+}
+
 .opportunity-list {
     margin-top: 10px;
     margin-bottom: 18px;
+}
+
+.opportunity-create input {
+    width: 200px;
 }
 
 .pl-1 {

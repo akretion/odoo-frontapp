@@ -2,7 +2,7 @@ from odoo import api, fields, models
 
 PARTNER_LIMIT = 10
 LEAD_LIMIT = 5
-LAST_CONVERSATIONS_COUNT = 3
+LAST_CONVERSATIONS_COUNT = 5
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -128,8 +128,20 @@ class ResPartner(models.Model):
                 % (odoo_server, partner["parent_id"][0], odoo_partner_action, odoo_partner_menu)
                )
             partner["conversation_id"] = conversation_key
-            if self._frontapp_conversations([partner["id"]], conversation_key)[0]:
+            related_conversations, other_conversations = self._frontapp_conversations(
+                [partner["id"]], conversation_key
+            )
+            if related_conversations:
                 partner["isLinked"] = True
+            partner["other_conversations"] = [
+                {
+                    "id": m.id,
+                    "subject": m.subject if m.subject else "",
+                    "date": m.date,
+                    "body": m.body,
+                    "author": m.author_id.name if m.author_id else "",
+                } for m in other_conversations
+            ]
         return partner_records
 
     @api.model
@@ -137,10 +149,14 @@ class ResPartner(models.Model):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         partner_data = {
-            "name": name,
             "created_from_frontapp": True,
             "company_type": company_type,
         }
+        if company_type == "person" and hasattr(self, "firstname") and len(name.split(" ")) > 1:
+            partner_data["firstname"] = name.split(" ")[0]
+            partner_data["lastname"] = name.split(" ")[1]
+        else:
+            partner_data["name"] = name
         if frontapp_context["conversation"].get("assignee"):
             partner_data["email"] = frontapp_context["conversation"]["assignee"].get("email")
         partner = super().create(partner_data)
@@ -148,21 +164,20 @@ class ResPartner(models.Model):
         return self.search_from_frontapp([], False, frontapp_context)
 
     def _frontapp_conversations(self, partner_ids, conversation_key=False):
-        domain = [
-            ("model", "=", "res.partner"),
-            ("subtype_id", "=", self.env.ref("frontapp_plugin.frontapp_conversation_link").id),
-        ]
+        domain = [("model", "=", "res.partner")]
         if partner_ids:
             domain.append(("res_id", "in", partner_ids))
-        domain_other = domain
+        domain_other = domain.copy()
         if conversation_key:
             domain.append(("frontapp_conversation_key", "=", conversation_key))
+            domain.append(("subtype_id", "=", self.env.ref("frontapp_plugin.frontapp_conversation_link").id))
         related_conversations = self.env["mail.message"].search(
             domain,
             order="write_date DESC",
         )
 
-        domain_other.append(('id', 'not in', related_conversations.mapped("id")))
+        domain_other.append(("subtype_id", "=", self.env.ref("mail.mt_note").id))
+        domain_other.append(("message_type", "=", "comment"))
         if related_conversations and not partner_ids:
             domain_other.append(("res_id", "=", related_conversations[0].res_id))
         other_conversations = self.env["mail.message"].search(
@@ -208,5 +223,17 @@ class ResPartner(models.Model):
                 "partner_id": partner.id,
                 "created_from_frontapp": True,
             })
+            partner.toggle_contact_link(True, frontapp_context)
+        return self.search_from_frontapp([], False, frontapp_context)
+
+    def create_contact_note(self, body, frontapp_context):
+        if not frontapp_context:
+            frontapp_context = {"conversation": {}}  # useful for local testing
+        for partner in self:
+            message = partner.message_post(
+                body=body,
+                message_type="comment",
+                subtype_xmlid="mail.mt_note",
+            )
             partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
