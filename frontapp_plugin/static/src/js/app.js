@@ -183,7 +183,9 @@ odoo.define("web.frontapp", function (require) {
             <Opportunity t-foreach="props.contact.opportunities" t-as="opportunity" t-key="opportunity.id" opportunity="opportunity"/>
         </div>
         <div>
-          <i class="fa fa-save" t-on-click="dispatch('createOpportunity', props.contact.id)"/>
+          <button t-on-click="dispatch('createOpportunity', props.contact.id)" >
+            <i class="fa fa-save"/>
+          </button>
           <input class="ml-1" placeholder="create Opportunity" t-att-id="'opp_input_' + props.contact.id"/>
         </div>
     </div>`;
@@ -221,16 +223,22 @@ odoo.define("web.frontapp", function (require) {
             </div>
         </div>
         <div>
-          <i class="fa fa-search" t-on-click="searchContact" />
+          <button>
+            <i class="fa fa-search" t-on-click="searchContact" />
+          </button>
           <input placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
         </div>
         <div>
-          <i class="fa fa-save" t-on-click="createContact" />
-          <span class="pl-1" t-on-click="createContact" >Create as Odoo Contact (FirstName LastName)</span>
+          <button t-on-click="createContact">
+            <i class="fa fa-save" />
+            Create Odoo Contact (FirstName LastName)
+          </button>
         </div>
         <div>
-          <i class="fa fa-save" t-on-click="createCompany" />
-          <span class="pl-1" t-on-click="createCompany" >Create as Odoo Company</span>
+          <button t-on-click="createCompany">
+            <i class="fa fa-save"  />
+            Create Odoo Company
+          </button>
         </div>
     </div>`;
 
@@ -259,8 +267,12 @@ odoo.define("web.frontapp", function (require) {
             }
 
             createContact(ev) {
-                console.log(this.inputRef.el.value);
-                createOdooContact(this.state.frontappContext, this.inputRef.el.value);
+                createOdooContact(this.state.frontappContext, this.inputRef.el.value, "person");
+                this.inputRef.el.value = "";
+            }
+
+            createCompany(ev) {
+                createOdooContact(this.state.frontappContext, this.inputRef.el.value, "company");
                 this.inputRef.el.value = "";
             }
 
@@ -268,7 +280,7 @@ odoo.define("web.frontapp", function (require) {
                 // 13 is keycode for ENTER
                 if (ev.keyCode === 13 || !ev.keyCode) {
                     loadContacts([], this.state.frontappContext, this.inputRef.el.value);
-                    ev.target.value = "";
+                    //ev.target.value = "";
                 }
             }
 
@@ -291,7 +303,6 @@ odoo.define("web.frontapp", function (require) {
         // -------------------------------------------------------------------------
         function makeStore() {
             const localState = window.localStorage.getItem("frontapp-odoo");
-            //const state = localState ? JSON.parse(localState) : initialState;
             const state = initialState;
             const store = new Store({state, actions});
             store.on("update", null, () => {
@@ -319,7 +330,7 @@ odoo.define("web.frontapp", function (require) {
         }
 
         function loadContacts(contact_emails, frontappContext, search_param) {
-            console.log("loadContacts", contact_emails, frontappContext, search_param);
+            //console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
             if (frontappContext && typeof frontappContext.conversation !== "undefined") {
                 app.dispatch("setFrontappContext", frontappContext);
@@ -348,7 +359,7 @@ odoo.define("web.frontapp", function (require) {
                 });
         }
 
-        function createOdooContact(frontappContext, name) {
+        function createOdooContact(frontappContext, name, company_type) {
             var app = window.odoo_app;
             simple_ajax
                 .jsonRpc(
@@ -357,7 +368,7 @@ odoo.define("web.frontapp", function (require) {
                     {
                         model: "res.partner",
                         method: "create_contact_from_frontapp",
-                        args: [name, frontappContext],
+                        args: [name, frontappContext, company_type],
                         kwargs: {},
                     },
                     {headers: {}}
