@@ -129,6 +129,7 @@ odoo.define("web.frontapp", function (require) {
                     });
             },
             setFrontappContext({state}, context) {
+                console.log("setting FrontApp Context to", context);
                 state.frontappContext = context;
             },
         };
@@ -329,7 +330,7 @@ odoo.define("web.frontapp", function (require) {
 
             mounted() {
                 this.inputRef.el.focus();
-                this.state = useState({name: "Hello"});
+                this.state = useState(initialState);
             }
 
             addContact(ev) {
@@ -413,7 +414,7 @@ odoo.define("web.frontapp", function (require) {
         function loadContacts(contact_emails, frontappContext, search_param) {
             //console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
-            if (frontappContext && typeof frontappContext.conversation !== "undefined") {
+            if (frontappContext && frontappContext.conversation) {
                 app.dispatch("setFrontappContext", frontappContext);
             }
             simple_ajax
