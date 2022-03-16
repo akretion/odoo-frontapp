@@ -55,6 +55,10 @@ odoo.define("web.frontapp", function (require) {
                 var contact = state.contacts.find((t) => t.id === id);
                 var input =  document.getElementById('opp_input_' + id);
                 var name = input.value;
+                if (name == "") {
+                    $('#error')[0].innerHTML = "Opportunity text cannot be blank!";
+                    return;
+                }
                 simple_ajax
                     .jsonRpc(
                         "/web/dataset/call_kw/res.partner",
@@ -90,7 +94,10 @@ odoo.define("web.frontapp", function (require) {
                 var contact = state.contacts.find((t) => t.id === id);
                 var input =  document.getElementById('note_input_' + id);
                 var body = input.value;
-                console.log("create note", body)
+                if (body == "") {
+                    $('#error')[0].innerHTML = "Note body cannot be blank!";
+                    return;
+                }
                 simple_ajax
                     .jsonRpc(
                         "/web/dataset/call_kw/res.partner",
@@ -274,26 +281,6 @@ odoo.define("web.frontapp", function (require) {
         // -------------------------------------------------------------------------
         const APP_TEMPLATE = xml`
     <div class="frontapp-odoo">
-        <div class="contact-list">
-            <Contact t-foreach="displayedContacts" t-as="contact" t-key="contact.id" contact="contact"/>
-        </div>
-        <div class="contact-panel" t-if="contacts.length">
-            <!--div class="contact-counter">
-                <t t-esc="displayedContacts.length"/>
-                <t t-if="displayedContacts.length lt contacts.length">
-                    / <t t-esc="contacts.length"/>
-                </t>
-                contact(s)
-            </div-->
-            <div>
-                <i class="fa fa-filter" />
-                <span class="pl-1" t-foreach="['all', 'linked']"
-                    t-as="f" t-key="f"
-                    t-att-class="{active: filter.value===f}"
-                    t-on-click="setFilter(f)"
-                    t-esc="f"/>
-            </div>
-        </div>
         <div>
           <button>
             <i class="fa fa-search" t-on-click="searchContact" />
@@ -303,14 +290,29 @@ odoo.define("web.frontapp", function (require) {
         <div>
           <button t-on-click="createContact">
             <i class="fa fa-save" />
-            Create Odoo Contact (FirstName LastName)
+            Create Contact (FirstName LastName)
           </button>
         </div>
         <div>
           <button t-on-click="createCompany">
             <i class="fa fa-save"  />
-            Create Odoo Company
+            Create Company
           </button>
+        </div>
+
+        <div class="contact-panel" t-if="contacts.length">
+            <div>
+                <i class="fa fa-filter" />
+                <span class="pl-1" t-foreach="['all', 'linked']"
+                    t-as="f" t-key="f"
+                    t-att-class="{active: filter.value===f}"
+                    t-on-click="setFilter(f)"
+                    t-esc="f"/>
+            </div>
+        </div>
+        <div id="error"></div>
+        <div class="contact-list">
+            <Contact t-foreach="displayedContacts" t-as="contact" t-key="contact.id" contact="contact"/>
         </div>
     </div>`;
 
@@ -339,11 +341,19 @@ odoo.define("web.frontapp", function (require) {
             }
 
             createContact(ev) {
+                if (this.inputRef.el.value == "") {
+                    $('#error')[0].innerHTML = "Contact name cannot be blank! (write the name in the search box)";
+                    return;
+                }
                 createOdooContact(this.state.frontappContext, this.inputRef.el.value, "person");
                 this.inputRef.el.value = "";
             }
 
             createCompany(ev) {
+                if (this.inputRef.el.value == "") {
+                    $('#error')[0].innerHTML = "Company name cannot be blank! (write it in the search box)";
+                    return;
+                }
                 createOdooContact(this.state.frontappContext, this.inputRef.el.value, "company");
                 this.inputRef.el.value = "";
             }

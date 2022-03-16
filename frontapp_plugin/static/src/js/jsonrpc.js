@@ -31,6 +31,7 @@ function _genericJsonRpc (fct_name, params, settings, fct) {
     var xhr = fct(data);
     var result = xhr.then(function(result) {
         bus.trigger('rpc:result', data, result);
+        $('#error')[0].innerHTML = "";
         if (result.error !== undefined) {
             if (result.error.data.arguments[0] !== "bus.Bus not available in test mode") {
                 console.debug(
@@ -41,7 +42,7 @@ function _genericJsonRpc (fct_name, params, settings, fct) {
                     "Error data debug:\n", result.error.data.debug
                 );
                 if (result.error.message == "Odoo Session Expired") {
-                  alert("You should login in Odoo to get the Odoo Frontapp plugin to work!");
+                  $('#error')[0].innerHTML = "You should login in Odoo to get the Odoo Frontapp plugin to work!";
                 }
             }
             return Promise.reject({type: "server", error: result.error});

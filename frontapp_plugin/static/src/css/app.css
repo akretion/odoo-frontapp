@@ -1,6 +1,6 @@
 .frontapp-odoo {
     width: 300px;
-    margin: 50px auto;
+    margin: 10px auto;
     display: flex;
     flex-direction: column;
 }
@@ -9,6 +9,11 @@
     margin-left: 10px;
     width: 250px;
     margin-bottom: 10px;
+}
+
+#error {
+    margin: 5px;
+    color: red;
 }
 
 .contact-list {
