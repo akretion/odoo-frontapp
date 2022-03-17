@@ -1,7 +1,3 @@
-============================
-FrontApp CRM plugin for Odoo
-============================
-
 .. image:: ../static/img/frontapp.png
 
 Introduction
