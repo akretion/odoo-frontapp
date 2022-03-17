@@ -54,9 +54,8 @@ class ResPartner(models.Model):
                     ("email", "in", contact_emails),
                     ("id", "in", linked_partner_ids),
                 ]
-        return super().search_read(
+        return super().search(
             domain,
-            fields=self._get_frontapp_partner_fields(),
             offset=0,
             limit=PARTNER_LIMIT,
             order="write_date DESC",
@@ -67,8 +66,6 @@ class ResPartner(models.Model):
         odoo_server = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         odoo_partner_action = self.env.ref("base.action_partner_form").id
         odoo_partner_menu = self.env.ref("crm.res_partner_menu_customer").id
-        odoo_lead_action = self.env.ref("crm.crm_lead_action_pipeline").id
-        odoo_lead_menu = self.env.ref("crm.crm_menu_leads").id
 
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
@@ -76,46 +73,18 @@ class ResPartner(models.Model):
         links = self._frontapp_conversations([], conversation_key)[0]
         linked_partner_ids = [link.res_id for link in links]
 
-        partner_records = self._search_frontapp_partners(
+        partners = self._search_frontapp_partners(
             contact_emails, search_param, linked_partner_ids
         )
-        partner_ids = [partner["id"] for partner in partner_records]
+        partner_ids = partners.mapped("id")
 
         # now we filter Odoo users out:
-        user_partners = [
-            u.partner_id.id
-            for u in self.env["res.users"].search([("partner_id", "in", partner_ids)])
-        ]
-        partner_records = [
-            p
-            for p in filter(
-                lambda partner: partner["id"] not in user_partners, partner_records
-            )
-        ]
-
-        # now we put linked partners 1st:
-        partner_records = sorted(
-            partner_records, key=lambda x: x["id"] in linked_partner_ids, reverse=True
-        )
-        partner_ids = [partner["id"] for partner in partner_records]
-
-        lead_records = self.env["crm.lead"].search_read(
-            domain=[("partner_id", "in", partner_ids)],
-            fields=self._get_frontapp_lead_fields(),
-            limit=LEAD_LIMIT,
-            order="write_date DESC",
-        )
-        for lead in lead_records:
-            lead["href"] = (
-                "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
-                % (odoo_server, lead["id"], odoo_lead_action, odoo_lead_menu)
-            )
-        partner_leads = {
-            partner["id"]: [
-                lead for lead in lead_records if lead["partner_id"][0] == partner["id"]
-            ]
-            for partner in partner_records
-        }
+        user_partners = self.env["res.users"].search(
+            [("partner_id", "in", partner_ids)]
+        ).mapped("id")
+        partners = partners.filtered(lambda p: p.id not in user_partners)
+        partner_leads = partners._get_partner_leads()
+        partner_records = partners.read(fields=self._get_frontapp_partner_fields())
         for partner in partner_records:
             partner["opportunities"] = partner_leads[partner["id"]]
             partner["href"] = (
@@ -142,6 +111,12 @@ class ResPartner(models.Model):
                     "author": m.author_id.name if m.author_id else "",
                 } for m in other_conversations
             ]
+
+        # now we put linked partners or partners with more leads 1st:
+        partner_records = sorted(
+            partner_records, key=lambda x: (x["id"] in linked_partner_ids, len(x['opportunities'])), reverse=True
+            # TODO append partners
+        )
         return partner_records
 
     @api.model
@@ -162,6 +137,27 @@ class ResPartner(models.Model):
         partner = super().create(partner_data)
         partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
+
+    def _get_partner_leads(self):
+        odoo_server = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
+        odoo_lead_action = self.env.ref("crm.crm_lead_action_pipeline").id
+        odoo_lead_menu = self.env.ref("crm.crm_menu_leads").id
+        partner_leads = {}
+        for partner in self:
+            leads = self.env['crm.lead']
+            leads |= self.env['crm.lead'].search(
+                [("partner_id", '=', partner.id)],
+                limit=LEAD_LIMIT,
+                order="write_date DESC",
+            )
+            lead_records = leads.read(fields=self._get_frontapp_lead_fields())
+            for lead in lead_records:
+                lead["href"] = (
+                    "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
+                    % (odoo_server, lead["id"], odoo_lead_action, odoo_lead_menu)
+                )
+            partner_leads[partner.id] = lead_records
+        return partner_leads
 
     def _frontapp_conversations(self, partner_ids, conversation_key=False):
         domain = [("model", "=", "res.partner")]
