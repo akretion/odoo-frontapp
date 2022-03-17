@@ -19,6 +19,10 @@ Frontapp Plugin
 
 |badge1| |badge2| |badge3| 
 
+============================
+FrontApp CRM plugin for Odoo
+============================
+
 .. image:: https://raw.githubusercontent.com/akretion/odoo-frontapp/14.0/frontapp_plugin/static/img/frontapp.png
 
 Introduction
@@ -43,6 +47,8 @@ cookie is in fact reused in the plugin iframe that is itself hosted on your Odoo
 
 Testing it
 ~~~~~~~~~~
+
+.. image:: https://raw.githubusercontent.com/akretion/odoo-frontapp/14.0/frontapp_plugin/static/img/panel.png
 
 You can test it easily with an Odoo database with demo data and point your browser to `http://localhost:8069/frontapp-plugin`. The linked demo contacts are not linked to any
 specific FrontApp conversation but you can have an idea how it works. This way of testing is handy for developping or extending the plugin.
