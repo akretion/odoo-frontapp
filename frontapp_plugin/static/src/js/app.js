@@ -180,6 +180,9 @@ odoo.define("web.frontapp", function (require) {
       <a class="pl-1" t-att-href="props.opportunity.href" target="_blank">
         <t t-esc="props.opportunity.name"/>
       </a>
+        -
+      <t t-esc="props.opportunity.stage_id[1]"/>
+      <i class="fa fa-star pl-1" t-foreach="[...Array(props.opportunity.stars).keys()]" />
     </div>`;
 
         class Opportunity extends Component {
@@ -208,11 +211,28 @@ odoo.define("web.frontapp", function (require) {
           <t t-esc="props.contact.name"/>
         </a>
         <span class="delete" t-on-click="dispatch('deleteContact', props.contact.id)">🗑</span>
+        </div>
+
         <div class="ml-1" t-if="props.contact.categories.length > 0" >
             <span class="tag" t-foreach="props.contact.categories"
                     t-as="tag" t-key="tag" t-esc="tag" />
+
         </div>
+
+        <!-- FIXME these are customer specific fields -->
+        <div t-if="props.contact.stage_id" >
+            <i class="fa fa-forward" />
+            <span class="pl-1" >
+              <t t-esc="props.contact.stage_id[1]" />
+            </span>
         </div>
+        <div t-if="props.contact.parent_relation_id" >
+            <i class="fa fa-battery-2" />
+            <span class="pl-1" >
+              <t t-esc="props.contact.parent_relation_id[1]" />
+            </span>
+        </div>
+
         <div t-if="props.contact.function" >
           <t t-esc="props.contact.function" />
         </div>

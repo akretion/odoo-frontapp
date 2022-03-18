@@ -157,6 +157,7 @@ class ResPartner(models.Model):
                     "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
                     % (odoo_server, lead["id"], odoo_lead_action, odoo_lead_menu)
                 )
+                lead["stars"] = int(lead["priority"])
             partner_leads[partner.id] = lead_records
         return partner_leads
 
