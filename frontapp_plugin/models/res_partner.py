@@ -87,6 +87,7 @@ class ResPartner(models.Model):
         partner_records = partners.read(fields=self._get_frontapp_partner_fields())
         for partner in partner_records:
             partner["opportunities"] = partner_leads[partner["id"]]
+            partner["categories"] = self.env["res.partner.category"].browse(partner["category_id"]).mapped("name")
             partner["href"] = (
                 "%s/web#id=%s&action=%s&model=res.partner&view_type=form&cids=&menu_id=%s"
                 % (odoo_server, partner["id"], odoo_partner_action, odoo_partner_menu)
