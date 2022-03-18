@@ -69,6 +69,17 @@ div.contact-info {
     text-decoration: none;
 }
 
+span.tag {
+    font-size: 12px;
+    background-color: #EB7E7F;
+    color: #FFFFFF;
+    padding-right: 0.6em;
+    padding-left: 0.6em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    border-radius: 10rem;
+}
+
 .contact-panel {
     color: #0088ff;
     margin-top: 8px;

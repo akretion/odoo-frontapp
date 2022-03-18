@@ -20,6 +20,7 @@ odoo.define("web.frontapp", function (require) {
                 }
             },
             toggleContactLink({state}, id) {
+                window.odoo_app.dispatch("ensureFrontappContext");
                 var contact = state.contacts.find((t) => t.id === id);
                 simple_ajax
                     .jsonRpc(
@@ -128,9 +129,20 @@ odoo.define("web.frontapp", function (require) {
                         console.log("create_contact_note KO!", this);
                     });
             },
-            setFrontappContext({state}, context) {
-                console.log("setting FrontApp Context to", context);
-                state.frontappContext = context;
+            ensureFrontappContext({state}, frontappContext) {
+                console.log("ensureFrontappContext");
+                if (frontappContext) {
+                    console.log("setting FrontApp Context to", frontappContext);
+                    state.frontappContext = frontappContext;
+                }
+                if (window.location !== window.parent.location) {
+                    frontappContext = state.frontappContext;
+                    if (!(frontappContext && frontappContext.conversation && frontappContext.conversation.subject !== undefined)) {
+                        var error = "Warning no FrontApp Conversion found!<br/>You might try select a conversation or try to refresh your browser using F5 if the problem persists."
+                        $('#error')[0].innerHTML = error;
+                        throw error;
+                    }
+                }
             },
         };
 
@@ -195,8 +207,11 @@ odoo.define("web.frontapp", function (require) {
         <a class="pl-1" t-att-href="props.contact.href" target="_blank">
           <t t-esc="props.contact.name"/>
         </a>
-
         <span class="delete" t-on-click="dispatch('deleteContact', props.contact.id)">🗑</span>
+        <div class="ml-1" t-if="props.contact.categories.length > 0" >
+            <span class="tag" t-foreach="props.contact.categories"
+                    t-as="tag" t-key="tag" t-esc="tag" />
+        </div>
         </div>
         <div t-if="props.contact.function" >
           <t t-esc="props.contact.function" />
@@ -343,6 +358,7 @@ odoo.define("web.frontapp", function (require) {
             }
 
             createContact(ev) {
+                window.odoo_app.dispatch("ensureFrontappContext");
                 if (this.inputRef.el.value == "") {
                     $('#error')[0].innerHTML = "Contact name cannot be blank! (write the name in the search box)";
                     return;
@@ -352,6 +368,7 @@ odoo.define("web.frontapp", function (require) {
             }
 
             createCompany(ev) {
+                window.odoo_app.dispatch("ensureFrontappContext");
                 if (this.inputRef.el.value == "") {
                     $('#error')[0].innerHTML = "Company name cannot be blank! (write it in the search box)";
                     return;
@@ -400,26 +417,25 @@ odoo.define("web.frontapp", function (require) {
             const env = {store: makeStore()};
             mount(App, {target: document.body, env}).then((app) => {
                 window.odoo_app = app;
-                // TODO FIXME: useful for testing:
-                loadContacts(
-                    [
-                        "info@agrolait.com",
-                        "info@deltapc.com",
-                        "billy.fox45@example.com",
-                    ],
-                    {}
-                );
+                if (window.location == window.parent.location) {
+                    // demo data for localhost testing:
+                    loadContacts(
+                        [
+                            "hello@dualsun.com",
+                            "info@agrolait.com",
+                            "info@deltapc.com",
+                            "billy.fox45@example.com",
+                        ],
+                        {}
+                    );
+                }
             });
         }
 
         function loadContacts(contact_emails, frontappContext, search_param) {
             //console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
-            if (frontappContext && frontappContext.conversation && frontappContext.conversation.subject !== undefined) {
-                app.dispatch("setFrontappContext", frontappContext);
-            } else {
-                $('#error')[0].innerHTML = "Warning no FrontApp Conversion found!<br/>You might try select a conversation or try to refresh your browser using F5 if the problem persists."
-            }
+            app.dispatch("ensureFrontappContext", frontappContext);
             simple_ajax
                 .jsonRpc(
                     "/web/dataset/call_kw/res.partner",
@@ -437,7 +453,7 @@ odoo.define("web.frontapp", function (require) {
                     app.dispatch("resetContacts");
                     if (contacts.length > 0) {
                       $('#info')[0].innerHTML = "";
-                      $('#error')[0].innerHTML = "";
+                      //$('#error')[0].innerHTML = "";
                     } else {
                       $('#info')[0].innerHTML = "No contact matching this conversation!<br/>You can search for a contact (by name or email) and link it to the conversation.<br/>Or you can also create a new Odoo contact or company.";
                     }
