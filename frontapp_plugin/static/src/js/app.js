@@ -200,7 +200,7 @@ odoo.define("web.frontapp", function (require) {
         <input type="checkbox" t-att-checked="props.contact.isLinked"
             t-att-id="props.contact.id"
             t-on-click="dispatch('toggleContactLink', props.contact.id)"/>
-          
+
         <t t-if="props.contact.company_type=='company'" >
           <i class="fa fa-institution" />
         </t>
@@ -258,7 +258,7 @@ odoo.define("web.frontapp", function (require) {
         </div>
         <div>
           <i class="fa fa-map-marker" />
- 
+
             <span class="pl-1" t-if="props.contact.zip" >
               <t t-esc="props.contact.zip" />
             </span>
@@ -321,7 +321,7 @@ odoo.define("web.frontapp", function (require) {
           <button>
             <i class="fa fa-search" t-on-click="searchContact" />
           </button>
-          <input id="search_input" placeholder="Search for partner" t-on-keyup="searchContact" t-ref="add-input"/>
+          <input id="search_input" placeholder="Search for Odoo contact" t-on-keyup="searchContact" t-ref="add-input"/>
         </div>
         <div>
           <button t-on-click="createContact">
@@ -518,10 +518,14 @@ odoo.define("web.frontapp", function (require) {
                     break;
                 case "singleConversation":
                     console.log("Selected conversation:", context.conversation);
-                    var contacts = [
-                        context.conversation.assignee.email,
-                        context.conversation.recipient.handle,
-                    ];
+                    // TODO  assignee can be undefined in https://app.frontapp.com/inboxes/teams/views/9523270/open/26322453318
+                    var contacts = [];
+                    if (context.conversation && context.conversation.assignee) {
+                        contacts.push(context.conversation.assignee.email)
+                    }
+                    if (context.conversation && context.conversation.recipient) {
+                        contacts.push(context.conversation.recipient.handle)
+                    }
                     $('#search_input')[0].value="";
                     $('#error')[0].innerHTML = "";
                     loadContacts(contacts, context);
