@@ -4,6 +4,7 @@ PARTNER_LIMIT = 10
 LEAD_LIMIT = 5
 LAST_CONVERSATIONS_COUNT = 5
 
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
@@ -94,9 +95,9 @@ class ResPartner(models.Model):
             )
             if partner.get("parent_id"):
                 partner["parent_href"] = (
-                "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
-                % (odoo_server, partner["parent_id"][0], odoo_partner_action, odoo_partner_menu)
-               )
+                    "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
+                    % (odoo_server, partner["parent_id"][0], odoo_partner_action, odoo_partner_menu)
+                )
             partner["conversation_id"] = conversation_key
             related_conversations, other_conversations = self._frontapp_conversations(
                 [partner["id"]], conversation_key
@@ -162,27 +163,63 @@ class ResPartner(models.Model):
         return partner_leads
 
     def _frontapp_conversations(self, partner_ids, conversation_key=False):
+        """
+        Retrieves related FrontApp conversations and other notes, including
+        other FrontApp conversations.
+        """
         domain = [("model", "=", "res.partner")]
         if partner_ids:
             domain.append(("res_id", "in", partner_ids))
+        domain_other_frontapp = domain.copy()
         domain_other = domain.copy()
+
+        # related FrontApp conversations:
         if conversation_key:
             domain.append(("frontapp_conversation_key", "=", conversation_key))
-            domain.append(("subtype_id", "=", self.env.ref("frontapp_plugin.frontapp_conversation_link").id))
+            domain_other_frontapp.append(
+                ("frontapp_conversation_key", "!=", conversation_key)
+            )
+            domain.append(
+                (
+                    "subtype_id",
+                    "=",
+                    self.env.ref("frontapp_plugin.frontapp_conversation_link").id
+                )
+            )
         related_conversations = self.env["mail.message"].search(
             domain,
             order="write_date DESC",
         )
 
+        # other FrontApp conversations (not related to the conversation_key):
+        domain_other_frontapp.append(
+            (
+                "subtype_id",
+                "=",
+                self.env.ref("frontapp_plugin.frontapp_conversation_link").id
+            )
+        )
+        if related_conversations and not partner_ids:
+            domain_other_frontapp.append(
+                ("res_id", "=", related_conversations[0].res_id)
+            )
+        other_conversations = self.env["mail.message"].search(
+            domain_other_frontapp,
+            order="write_date DESC",
+            limit=LAST_CONVERSATIONS_COUNT,
+        )
+
+        # Other notes:
         domain_other.append(("subtype_id", "=", self.env.ref("mail.mt_note").id))
         domain_other.append(("message_type", "=", "comment"))
         if related_conversations and not partner_ids:
             domain_other.append(("res_id", "=", related_conversations[0].res_id))
-        other_conversations = self.env["mail.message"].search(
+        other_conversations |= self.env["mail.message"].search(
             domain_other,
             order="write_date DESC",
             limit=LAST_CONVERSATIONS_COUNT,
         )
+
         return (related_conversations, other_conversations)
 
     def toggle_contact_link(self, is_linked, frontapp_context):
@@ -216,7 +253,7 @@ class ResPartner(models.Model):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         for partner in self:
-            opp = self.env["crm.lead"].create({
+            self.env["crm.lead"].create({
                 "name": name,
                 "partner_id": partner.id,
                 "created_from_frontapp": True,
@@ -228,7 +265,7 @@ class ResPartner(models.Model):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         for partner in self:
-            message = partner.message_post(
+            partner.message_post(
                 body=body,
                 message_type="comment",
                 subtype_xmlid="mail.mt_note",
