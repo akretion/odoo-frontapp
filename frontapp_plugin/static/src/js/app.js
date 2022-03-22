@@ -226,10 +226,10 @@ odoo.define("web.frontapp", function (require) {
               <t t-esc="props.contact.stage_id[1]" />
             </span>
         </div>
-        <div t-if="props.contact.parent_relation_id" >
+        <div t-if="props.contact.relation_id" >
             <i class="fa fa-battery-2" />
             <span class="pl-1" >
-              <t t-esc="props.contact.parent_relation_id[1]" />
+              <t t-esc="props.contact.relation_id[1]" />
             </span>
         </div>
 
