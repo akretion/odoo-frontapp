@@ -337,6 +337,7 @@ odoo.define("web.frontapp", function (require) {
         </div>
 
         <div class="contact-panel" t-if="contacts.length">
+            <a style="float:right" href="/web/session/logout?redirect=/frontapp-plugin">Logout</a>
             <div>
                 <i class="fa fa-filter" />
                 <span class="pl-1" t-foreach="['all', 'linked']"
@@ -347,6 +348,25 @@ odoo.define("web.frontapp", function (require) {
             </div>
         </div>
         <div id="error"></div>
+	<div id="login" style="display:none;margin-top:10px">
+            <form class="oe_login_form" role="form" method="post" onsubmit="this.action = '/web/login' + location.hash" action="/web/login">
+                <input type="hidden" name="csrf_token" id="csrf_token" />
+                <div class="form-group field-login">
+                    <label for="login">Email</label>
+                    <input type="text" placeholder="Email" name="login" id="login" required="required" autofocus="autofocus" autocapitalize="off" class="form-control "/>
+                </div>
+
+                <div class="form-group field-password">
+                    <label for="password">Login</label>
+                    <input type="password" placeholder="Password" name="password" id="password" required="required" autocomplete="current-password" maxlength="4096" class="form-control "/>
+                </div>
+
+                <div class="clearfix oe_login_buttons text-center mb-1 pt-3">
+                    <button type="submit" class="btn btn-primary btn-block">Connexion</button>
+                </div>
+		<input type="hidden" name="redirect" value="/frontapp-plugin" />
+            </form>
+	</div>
         <div id="info"></div>
         <div class="contact-list">
             <Contact t-foreach="displayedContacts" t-as="contact" t-key="contact.id" contact="contact"/>
@@ -452,6 +472,11 @@ odoo.define("web.frontapp", function (require) {
             });
         }
 
+	function showLoginForm() {
+	    $("#login")[0].style.display = "block";
+	    $("#csrf_token")[0].value = odoo.csrf_token;
+	}
+
         function loadContacts(contact_emails, frontappContext, search_param) {
             //console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
@@ -481,8 +506,12 @@ odoo.define("web.frontapp", function (require) {
                         app.dispatch("addContact", contact);
                     });
                 })
-                .guardedCatch(function () {
-                    console.log("contact search KO!", this);
+                .guardedCatch(function (error) {
+		    if (error && error.message && error.message.code == 100) {
+			showLoginForm();
+		    } else {
+        		console.log("contact search KO!", this, error);
+		    }
                 });
         }
 
