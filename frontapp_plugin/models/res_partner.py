@@ -71,7 +71,7 @@ class ResPartner(models.Model):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         conversation_key = frontapp_context["conversation"].get("id", "no_conversation")
-        links = self._frontapp_conversations([], conversation_key)[0]
+        links = self._frontapp_conversations("res.partner", [], conversation_key)[0]
         linked_partner_ids = [link.res_id for link in links]
 
         partners = self._search_frontapp_partners(
@@ -84,7 +84,7 @@ class ResPartner(models.Model):
             [("partner_id", "in", partner_ids)]
         ).mapped("id")
         partners = partners.filtered(lambda p: p.id not in user_partners)
-        partner_leads = partners._get_partner_leads()
+        partner_leads = partners._get_partner_leads(conversation_key)
         partner_records = partners.read(fields=self._get_frontapp_partner_fields())
         for partner in partner_records:
             partner["opportunities"] = partner_leads[partner["id"]]
@@ -100,7 +100,7 @@ class ResPartner(models.Model):
                 )
             partner["conversation_id"] = conversation_key
             related_conversations, other_conversations = self._frontapp_conversations(
-                [partner["id"]], conversation_key
+                "res.partner", [partner["id"]], conversation_key
             )
             if related_conversations:
                 partner["isLinked"] = True
@@ -140,7 +140,7 @@ class ResPartner(models.Model):
         partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
 
-    def _get_partner_leads(self):
+    def _get_partner_leads(self, conversation_key):
         odoo_server = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         odoo_lead_action = self.env.ref("crm.crm_lead_action_pipeline").id
         odoo_lead_menu = self.env.ref("crm.crm_menu_leads").id
@@ -159,17 +159,24 @@ class ResPartner(models.Model):
                     % (odoo_server, lead["id"], odoo_lead_action, odoo_lead_menu)
                 )
                 lead["stars"] = int(lead["priority"])
+
+                related_conversations, other_conversations = self._frontapp_conversations(
+                    "crm.lead", [lead["id"]], conversation_key
+                )
+                if related_conversations:
+                    lead["isLinked"] = True
+ 
             partner_leads[partner.id] = lead_records
         return partner_leads
 
-    def _frontapp_conversations(self, partner_ids, conversation_key=False):
+    def _frontapp_conversations(self, model, ids, conversation_key=False):
         """
         Retrieves related FrontApp conversations and other notes, including
         other FrontApp conversations.
         """
-        domain = [("model", "=", "res.partner")]
-        if partner_ids:
-            domain.append(("res_id", "in", partner_ids))
+        domain = [("model", "=", model)]
+        if ids:
+            domain.append(("res_id", "in", ids))
         domain_other_frontapp = domain.copy()
         domain_other = domain.copy()
 
@@ -199,7 +206,7 @@ class ResPartner(models.Model):
                 self.env.ref("frontapp_plugin.frontapp_conversation_link").id
             )
         )
-        if related_conversations and not partner_ids:
+        if related_conversations and not ids:
             domain_other_frontapp.append(
                 ("res_id", "=", related_conversations[0].res_id)
             )
@@ -212,7 +219,7 @@ class ResPartner(models.Model):
         # Other notes:
         domain_other.append(("subtype_id", "=", self.env.ref("mail.mt_note").id))
         domain_other.append(("message_type", "=", "comment"))
-        if related_conversations and not partner_ids:
+        if related_conversations and not ids:
             domain_other.append(("res_id", "=", related_conversations[0].res_id))
         other_conversations |= self.env["mail.message"].search(
             domain_other,
@@ -230,7 +237,7 @@ class ResPartner(models.Model):
         blurb = frontapp_context["conversation"].get("blurb", "no description")
         for partner in self:
             existing_links = self._frontapp_conversations(
-                [partner.id], conversation_key
+                "res.partner", [partner.id], conversation_key
             )[0]
             if is_linked:
                 if not existing_links:
@@ -238,13 +245,14 @@ class ResPartner(models.Model):
                     <h3>%s</h3><a class="frontapp_conversation_link" target="_blank"
                     href="https://app.frontapp.com/open/%s">%s...</a><br/>
                     <a href="/web#model=res.partner&amp;id=%s" class="o_mail_redirect"
-                    data-oe-id="3" data-oe-model="res.partner"
+                    data-oe-id="%s" data-oe-model="res.partner"
                     target="_blank">@%s</a>
                     """ % (
                         subject,
                         conversation_key,
                         blurb,
-                        self._uid,
+                        self.env.user.partner_id.id,
+                        self.env.user.partner_id.id,
                         self.env.user.name,
                     )
                     message = partner.message_post(

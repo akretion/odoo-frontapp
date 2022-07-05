@@ -13,12 +13,14 @@ odoo.define("web.frontapp", function (require) {
         // Store
         // -------------------------------------------------------------------------
         const actions = {
+
             addContact({state}, contact) {
                 console.log("ADD CONTACT", contact);
                 if (contact) {
                     state.contacts.push(contact);
                 }
             },
+
             toggleContactLink({state}, id) {
                 window.odoo_app.dispatch("ensureFrontappContext");
                 var contact = state.contacts.find((t) => t.id === id);
@@ -45,13 +47,16 @@ odoo.define("web.frontapp", function (require) {
                         console.log("link/unlink KO!", this);
                     });
             },
+
             deleteContact({state}, id) {
                 const index = state.contacts.findIndex((t) => t.id === id);
                 state.contacts.splice(index, 1);
             },
+
             resetContacts({state}, id) {
                 state.contacts = [];
             },
+
             createOpportunity({state}, id) {
                 var contact = state.contacts.find((t) => t.id === id);
                 var input =  document.getElementById('opp_input_' + id);
@@ -90,6 +95,41 @@ odoo.define("web.frontapp", function (require) {
                         console.log("create_contact_opportunity KO!", this);
                     });
             },
+
+            toggleOpportunityLink({state}, id) {
+                window.odoo_app.dispatch("ensureFrontappContext");
+		var opportunity = false;
+		state.contacts.forEach((contact, i) => {
+                    var opp = contact.opportunities.find((t) => t.id === id);
+ 		    if (opp) {
+			opportunity = opp;
+		    }
+		});
+
+                simple_ajax
+                    .jsonRpc(
+                        "/web/dataset/call_kw/res.partner",
+                        "call",
+                        {
+                            model: "crm.lead",
+                            method: "toggle_opportunity_link",
+                            args: [
+                                [opportunity.id],
+                                !opportunity.isLinked,
+                                state.frontappContext,
+                            ],
+                            kwargs: {context: {}},
+                        },
+                        {headers: {}}
+                    )
+                    .then(function (result) {
+                        opportunity.isLinked = !opportunity.isLinked;
+                    })
+                    .guardedCatch(function () {
+                        console.log("link/unlink KO!", this);
+                    });
+            },
+ 
             createNote({state}, id) {
                 console.log("create note", id)
                 var contact = state.contacts.find((t) => t.id === id);
@@ -129,6 +169,7 @@ odoo.define("web.frontapp", function (require) {
                         console.log("create_contact_note KO!", this);
                     });
             },
+
             ensureFrontappContext({state}, frontappContext) {
                 console.log("ensureFrontappContext");
                 if (frontappContext) {
@@ -185,12 +226,15 @@ odoo.define("web.frontapp", function (require) {
         const OPPORTUNITY_TEMPLATE = xml`
     <div class="opportunity">
       <i class="fa fa-rocket" />
+      <input type="checkbox" t-att-checked="props.opportunity.isLinked"
+          t-att-id="props.opportunity.id"  
+          t-on-click="dispatch('toggleOpportunityLink', props.opportunity.id)"/>  
+      <span><i class="fa fa-star pl-1" t-foreach="[...Array(props.opportunity.stars).keys()]" /></span>
       <a class="pl-1" t-att-href="props.opportunity.href" target="_blank">
         <t t-esc="props.opportunity.name"/>
       </a>
         -
       <t t-esc="props.opportunity.stage_id[1]"/>
-      <i class="fa fa-star pl-1" t-foreach="[...Array(props.opportunity.stars).keys()]" />
     </div>`;
 
         class Opportunity extends Component {
