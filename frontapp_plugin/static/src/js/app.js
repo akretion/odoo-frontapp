@@ -522,6 +522,11 @@ odoo.define("web.frontapp", function (require) {
                         ],
                         {}
                     );
+                } else if (window.delayed_search_contacts && window.delayed_search_context) {
+                    console.log("DELAYED SEARCH");
+                    loadContacts(window.delayed_search_contacts, window.delayed_search_context);
+                    delete window.delayed_search_contacts;
+                    delete window.delayed_search_context;
                 }
             });
         }
@@ -619,10 +624,20 @@ odoo.define("web.frontapp", function (require) {
                     if (context.conversation && context.conversation.recipient) {
                         contacts.push(context.conversation.recipient.handle)
                     }
-                    $('#search_input')[0].value="";
-                    $('#error')[0].innerHTML = "";
-                    loadContacts(contacts, context);
-                    break;
+                    if ($('#search_input') && $('#search_input')[0]) {
+                        $('#search_input')[0].value="";
+                    }
+                    if ($('#error') && $('#error')[0]) {
+                        $('#error')[0].innerHTML = "";
+                    }
+                    if (window.odoo_app) {
+                        loadContacts(contacts, context);
+                    } else {
+                        console.log("preparing delayed load")
+                        window.delayed_search_contacts = contacts;
+                        window.delayed_search_context = context;
+                    }
+		    break;
                 case "multiConversations":
                     console.log(
                         "Multiple conversations selected",
