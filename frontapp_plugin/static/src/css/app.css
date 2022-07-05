@@ -34,9 +34,6 @@
     padding-right: 10px;
     margin: 5px;
 }
-.contact label {
-    text-decoration: line-through;
-}
 
 .contact:hover {
     border: 2px solid rgb(54, 127, 238);
