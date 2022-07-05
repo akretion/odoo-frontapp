@@ -554,8 +554,18 @@ odoo.define("web.frontapp", function (require) {
                       $('#info')[0].innerHTML = "";
                       //$('#error')[0].innerHTML = "";
                     } else {
-                      $('#info')[0].innerHTML = "No contact matching this conversation!<br/>You can search for a contact (by name or email) and link it to the conversation.<br/>Or you can also create a new Odoo contact or company.";
+                      var search_result = "<p>No contact matching this conversation!"
+                      if (search_param) {
+                        search_result += " search_param: " + search_param + ";"
+                      }
+                      if (contact_emails) {
+                        search_result += " emails: " + contact_emails.join(', ')
+                      }
+                      search_result += "</p><p>You can search for a contact (by name or email) and link it to the conversation.</p>"
+                                    + "<p>Or you can also create a new Odoo contact or company.</p>";
+                      $('#info')[0].innerHTML = search_result
                     }
+
                     contacts.forEach((contact, i) => {
                         app.dispatch("addContact", contact);
                     });
