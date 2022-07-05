@@ -234,10 +234,18 @@ class ResPartner(models.Model):
             )[0]
             if is_linked:
                 if not existing_links:
-                    body = """<h3>%s</h3><a class="frontapp_conversation_link" target="_blank" href="https://app.frontapp.com/open/%s">%s...</a>""" % (
+                    body = """
+                    <h3>%s</h3><a class="frontapp_conversation_link" target="_blank"
+                    href="https://app.frontapp.com/open/%s">%s...</a><br/>
+                    <a href="/web#model=res.partner&amp;id=%s" class="o_mail_redirect"
+                    data-oe-id="3" data-oe-model="res.partner"
+                    target="_blank">@%s</a>
+                    """ % (
                         subject,
                         conversation_key,
                         blurb,
+                        self._uid,
+                        self.env.user.name,
                     )
                     message = partner.message_post(
                         subject=subject,
