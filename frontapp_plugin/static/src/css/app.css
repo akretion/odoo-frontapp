@@ -26,12 +26,12 @@
     grid-template-columns: 30px auto 30px;
     opacity: 0.5;
     box-shadow: rgb(0 0 0 / 4%) 0px 1px 1px;
-    border: 2px solid rgb(54, 127, 238);
+    border: 2px solid rgb(142, 181, 239);
     border-radius: 8px;
     padding-top: 10px;
     padding-bottom: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin: 5px;
 }
 .contact label {
@@ -39,7 +39,8 @@
 }
 
 .contact:hover {
-    background-color: #def0ff;
+    border: 2px solid rgb(54, 127, 238);
+    opacity: 0.75;
 }
 
 .contact > input {
@@ -48,7 +49,7 @@
 
 div.contact-info {
     font-size: 18px;
-    margin-left: -20px;
+    margin-left: -10px;
 }
 
 .delete {
@@ -121,10 +122,13 @@ span.tag {
 .note-author {
 }
 
-.note-create textarea {
+.note-create {
     margin-top: 10px;
     margin-bottom: -5px;
-    width: 202px;
+}
+
+.note-create textarea {
+    width: 215px;
 }
 
 .opportunity-list {
@@ -133,7 +137,7 @@ span.tag {
 }
 
 .opportunity-create input {
-    width: 200px;
+    width: 215px;
 }
 
 .pl-1 {
@@ -162,4 +166,79 @@ span.tag {
     border: 1px solid #CED4DA;
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+
+.wrap-collabsible {
+  margin-bottom: 1.2rem 0;
+}
+
+input[type='checkbox'].toggle {
+  display: none;
+}
+
+.lbl-toggle {
+  display: block;
+
+/*  font-weight: bold;
+  font-family: monospace;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-align: center;
+
+  padding: 1rem;
+
+  color: #A77B0E;
+*/
+  background: #fff19a;
+
+  cursor: pointer;
+
+  border-radius: 7px;
+  transition: all 0.25s ease-out;
+}
+
+.lbl-toggle:hover {
+  color: #7C5A0B;
+}
+
+.lbl-toggle::before {
+  content: ' ';
+  display: inline-block;
+
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+
+  transition: transform .2s ease-out;
+}
+
+.toggle:checked + .lbl-toggle::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible-content {
+  max-height: 150px;
+  overflow: hidden;
+  transition: max-height .25s ease-in-out;
+}
+
+.toggle:checked + .lbl-toggle + .collapsible-content {
+  max-height: 100vh;
+}
+
+.toggle:checked + .lbl-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.collapsible-content .content-inner {
+  background: rgba(250, 224, 66, .2);
+  border-bottom: 1px solid rgba(250, 224, 66, .45);
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: .5rem .5rem;
 }

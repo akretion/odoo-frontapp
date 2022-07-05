@@ -157,12 +157,20 @@ odoo.define("web.frontapp", function (require) {
         // Note Component
         // -------------------------------------------------------------------------
         const NOTE_TEMPLATE = xml`
-    <div class="note">
-      <i class="fa fa-comment" />
-      <span class="note-date" ><t t-esc="props.note.date"/></span>
-      <span class="note-author" ><t t-esc="props.note.author"/></span>
-      <div class="ml-1" ><t t-esc="props.note.subject"/></div>
-      <div class="ml-1" ><t t-raw="props.note.body"/></div>
+<div class="note wrap-collabsible">
+  <input t-att-id="'collapsible_' + props.note.id" class="toggle" type="checkbox" />
+  <label t-att-for="'collapsible_' + props.note.id" class="lbl-toggle">
+    <i class="fa fa-comment" />
+    <span class="note-date" ><t t-esc="props.note.date"/></span>
+    <span class="note-author" ><t t-esc="props.note.author"/></span>
+    <div class="ml-1" ><t t-esc="props.note.subject"/></div>
+  </label>
+  <div class="collapsible-content">
+    <div class="content-inner">
+      <t t-raw="props.note.body"/>
+    </div>
+  </div>
+
     </div>`;
 
         class Note extends Component {
@@ -201,6 +209,9 @@ odoo.define("web.frontapp", function (require) {
             t-att-id="props.contact.id"
             t-on-click="dispatch('toggleContactLink', props.contact.id)"/>
 
+        <span class="delete" t-on-click="dispatch('deleteContact', props.contact.id)" style="float:right" >
+	🗑
+	</span>
         <t t-if="props.contact.company_type=='company'" >
           <i class="fa fa-institution" />
         </t>
@@ -210,7 +221,6 @@ odoo.define("web.frontapp", function (require) {
         <a class="pl-1" t-att-href="props.contact.href" target="_blank">
           <t t-esc="props.contact.name"/>
         </a>
-        <span class="delete" t-on-click="dispatch('deleteContact', props.contact.id)">🗑</span>
         </div>
 
         <div class="ml-1" t-if="props.contact.categories.length > 0" >
@@ -288,7 +298,7 @@ odoo.define("web.frontapp", function (require) {
             <Opportunity t-foreach="props.contact.opportunities" t-as="opportunity" t-key="opportunity.id" opportunity="opportunity"/>
         </div>
         <div class="opportunity-create">
-          <button t-on-click="dispatch('createOpportunity', props.contact.id)" >
+          <button t-on-click="dispatch('createOpportunity', props.contact.id)" style="float:right" >
             <i class="fa fa-save"/>
           </button>
           <input class="ml-1" placeholder="create Opportunity" t-att-id="'opp_input_' + props.contact.id"/>
@@ -298,7 +308,7 @@ odoo.define("web.frontapp", function (require) {
             <Note t-foreach="props.contact.other_conversations" t-as="note" t-key="note.id" note="note"/>
         </div>
         <div class="note-create">
-          <button t-on-click="dispatch('createNote', props.contact.id)" >
+          <button t-on-click="dispatch('createNote', props.contact.id)" style="float:right" >
             <i class="fa fa-save"/>
           </button>
           <textarea class="ml-1" placeholder="create Note" t-att-id="'note_input_' + props.contact.id"/>
