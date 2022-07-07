@@ -111,12 +111,13 @@ span.tag {
 .fa-star {
     color: #bdbd01;
 }
+
 .note-date {
     margin-left: 5px;
-    margin-right: 5px;
 }
 
 .note-author {
+    margin-left: 35px;
 }
 
 .note-create {

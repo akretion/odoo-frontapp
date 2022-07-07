@@ -98,17 +98,17 @@ odoo.define("web.frontapp", function (require) {
 
             toggleOpportunityLink({state}, id) {
                 window.odoo_app.dispatch("ensureFrontappContext");
-		var opportunity = false;
-		state.contacts.forEach((contact, i) => {
-                    var opp = contact.opportunities.find((t) => t.id === id);
- 		    if (opp) {
-			opportunity = opp;
-		    }
-		});
+                var opportunity = false;
+                state.contacts.forEach((contact, i) => {
+                                var opp = contact.opportunities.find((t) => t.id === id);
+                    if (opp) {
+                  opportunity = opp;
+                    }
+                });
 
                 simple_ajax
                     .jsonRpc(
-                        "/web/dataset/call_kw/res.partner",
+                        "/web/dataset/call_kw/crm.lead",
                         "call",
                         {
                             model: "crm.lead",
@@ -129,7 +129,7 @@ odoo.define("web.frontapp", function (require) {
                         console.log("link/unlink KO!", this);
                     });
             },
- 
+
             createNote({state}, id) {
                 console.log("create note", id)
                 var contact = state.contacts.find((t) => t.id === id);
@@ -203,7 +203,7 @@ odoo.define("web.frontapp", function (require) {
   <label t-att-for="'collapsible_' + props.note.id" class="lbl-toggle">
     <i class="fa fa-comment" />
     <span class="note-date" ><t t-esc="props.note.date"/></span>
-    <span class="note-author" ><t t-esc="props.note.author"/></span>
+    <div class="note-author" ><t t-esc="props.note.author"/></div>
     <div class="ml-1" ><t t-esc="props.note.subject"/></div>
   </label>
   <div class="collapsible-content">
@@ -227,8 +227,8 @@ odoo.define("web.frontapp", function (require) {
     <div class="opportunity">
       <i class="fa fa-rocket" />
       <input type="checkbox" t-att-checked="props.opportunity.isLinked"
-          t-att-id="props.opportunity.id"  
-          t-on-click="dispatch('toggleOpportunityLink', props.opportunity.id)"/>  
+          t-att-id="props.opportunity.id"
+          t-on-click="dispatch('toggleOpportunityLink', props.opportunity.id)"/>
       <span><i class="fa fa-star pl-1" t-foreach="[...Array(props.opportunity.stars).keys()]" /></span>
       <a class="pl-1" t-att-href="props.opportunity.href" target="_blank">
         <t t-esc="props.opportunity.name"/>
@@ -406,12 +406,12 @@ odoo.define("web.frontapp", function (require) {
             <form class="oe_login_form" role="form" method="post" onsubmit="this.action = '/web/login' + location.hash" action="/web/login">
                 <input type="hidden" name="csrf_token" id="csrf_token" />
                 <div class="form-group field-login">
-                    <label for="login">Email</label>
-                    <input type="text" placeholder="Email" name="login" id="login" required="required" autofocus="autofocus" autocapitalize="off" class="form-control "/>
+                    <label for="login">Login</label>
+                    <input type="text" placeholder="Login" name="login" id="login" required="required" autofocus="autofocus" autocapitalize="off" class="form-control "/>
                 </div>
 
                 <div class="form-group field-password">
-                    <label for="password">Login</label>
+                    <label for="password">Password</label>
                     <input type="password" placeholder="Password" name="password" id="password" required="required" autocomplete="current-password" maxlength="4096" class="form-control "/>
                 </div>
 
