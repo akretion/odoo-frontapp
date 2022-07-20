@@ -7,7 +7,7 @@
         Plugin for FrontApp CRM""",
     "version": "14.0.1.0.0",
     "license": "LGPL-3",
-    "authors": "Akretion,Odoo Community Association (OCA)",
+    "authors": "Akretion",
     "website": "https://github.com/akretion/odoo-frontapp",
     "depends": ["crm"],
     "maintainers": ["rvalyi"],
