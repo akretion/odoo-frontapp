@@ -357,7 +357,7 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Contact extends Component {
-           dispatch = useDispatch();
+            dispatch = useDispatch();
         }
         Contact.template = CONTACT_TEMPLATE;
         Contact.props = ["contact"];
@@ -502,7 +502,6 @@ odoo.define("web.frontapp", function (require) {
         App.template = APP_TEMPLATE;
         App.components = {Contact};
         //App.props = ["name"];
-
 
         // -------------------------------------------------------------------------
         // Setup code
