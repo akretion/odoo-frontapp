@@ -252,8 +252,8 @@ odoo.define("web.frontapp", function (require) {
             t-on-click="dispatch('toggleContactLink', props.contact.id)"/>
 
         <span class="delete" t-on-click="dispatch('deleteContact', props.contact.id)" style="float:right" >
-	🗑
-	</span>
+    🗑
+    </span>
         <t t-if="props.contact.company_type=='company'" >
           <i class="fa fa-institution" />
         </t>
@@ -400,7 +400,7 @@ odoo.define("web.frontapp", function (require) {
             </div>
         </div>
         <div id="error"></div>
-	<div id="login" style="display:none;margin-top:10px">
+    <div id="login" style="display:none;margin-top:10px">
             <form class="oe_login_form" role="form" method="post" onsubmit="this.action = '/web/login' + location.hash" action="/web/login">
                 <input type="hidden" name="csrf_token" id="csrf_token" />
                 <div class="form-group field-login">
@@ -416,9 +416,9 @@ odoo.define("web.frontapp", function (require) {
                 <div class="clearfix oe_login_buttons text-center mb-1 pt-3">
                     <button type="submit" class="btn btn-primary btn-block">Connexion</button>
                 </div>
-		<input type="hidden" name="redirect" value="/frontapp-plugin" />
+        <input type="hidden" name="redirect" value="/frontapp-plugin" />
             </form>
-	</div>
+    </div>
         <div id="info"></div>
         <div class="contact-list">
             <Contact t-foreach="displayedContacts" t-as="contact" t-key="contact.id" contact="contact"/>
