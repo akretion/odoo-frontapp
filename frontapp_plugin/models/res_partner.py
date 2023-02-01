@@ -80,15 +80,21 @@ class ResPartner(models.Model):
         partner_ids = partners.mapped("id")
 
         # now we filter Odoo users out:
-        user_partners = self.env["res.users"].search(
-            [("partner_id", "in", partner_ids)]
-        ).mapped("id")
+        user_partners = (
+            self.env["res.users"]
+            .search([("partner_id", "in", partner_ids)])
+            .mapped("id")
+        )
         partners = partners.filtered(lambda p: p.id not in user_partners)
         partner_leads = partners._get_partner_leads(conversation_key)
         partner_records = partners.read(fields=self._get_frontapp_partner_fields())
         for partner in partner_records:
             partner["opportunities"] = partner_leads[partner["id"]]
-            partner["categories"] = self.env["res.partner.category"].browse(partner["category_id"]).mapped("name")
+            partner["categories"] = (
+                self.env["res.partner.category"]
+                .browse(partner["category_id"])
+                .mapped("name")
+            )
             partner["href"] = (
                 "%s/web#id=%s&action=%s&model=res.partner&view_type=form&cids=&menu_id=%s"
                 % (odoo_server, partner["id"], odoo_partner_action, odoo_partner_menu)
@@ -96,7 +102,12 @@ class ResPartner(models.Model):
             if partner.get("parent_id"):
                 partner["parent_href"] = (
                     "%s/web#id=%s&action=%s&model=crm.lead&view_type=form&cids=&menu_id=%s"
-                    % (odoo_server, partner["parent_id"][0], odoo_partner_action, odoo_partner_menu)
+                    % (
+                        odoo_server,
+                        partner["parent_id"][0],
+                        odoo_partner_action,
+                        odoo_partner_menu,
+                    )
                 )
             partner["conversation_id"] = conversation_key
             related_conversations, other_conversations = self._frontapp_conversations(
@@ -111,12 +122,15 @@ class ResPartner(models.Model):
                     "date": m.date,
                     "body": m.body,
                     "author": m.author_id.name if m.author_id else "",
-                } for m in other_conversations
+                }
+                for m in other_conversations
             ]
 
         # now we put linked partners or partners with more leads 1st:
         partner_records = sorted(
-            partner_records, key=lambda x: (x["id"] in linked_partner_ids, len(x['opportunities'])), reverse=True
+            partner_records,
+            key=lambda x: (x["id"] in linked_partner_ids, len(x["opportunities"])),
+            reverse=True
             # TODO append partners
         )
         return partner_records
@@ -129,13 +143,19 @@ class ResPartner(models.Model):
             "created_from_frontapp": True,
             "company_type": company_type,
         }
-        if company_type == "person" and hasattr(self, "firstname") and len(name.split(" ")) > 1:
+        if (
+            company_type == "person"
+            and hasattr(self, "firstname")
+            and len(name.split(" ")) > 1
+        ):
             partner_data["firstname"] = name.split(" ")[0]
             partner_data["lastname"] = name.split(" ")[1]
         else:
             partner_data["name"] = name
         if frontapp_context["conversation"].get("assignee"):
-            partner_data["email"] = frontapp_context["conversation"]["assignee"].get("email")
+            partner_data["email"] = frontapp_context["conversation"]["assignee"].get(
+                "email"
+            )
         partner = super().create(partner_data)
         partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
@@ -146,9 +166,9 @@ class ResPartner(models.Model):
         odoo_lead_menu = self.env.ref("crm.crm_menu_leads").id
         partner_leads = {}
         for partner in self:
-            leads = self.env['crm.lead']
-            leads |= self.env['crm.lead'].search(
-                [("partner_id", '=', partner.id)],
+            leads = self.env["crm.lead"]
+            leads |= self.env["crm.lead"].search(
+                [("partner_id", "=", partner.id)],
                 limit=LEAD_LIMIT,
                 order="write_date DESC",
             )
@@ -160,12 +180,15 @@ class ResPartner(models.Model):
                 )
                 lead["stars"] = int(lead["priority"])
 
-                related_conversations, other_conversations = self._frontapp_conversations(
+                (
+                    related_conversations,
+                    other_conversations,
+                ) = self._frontapp_conversations(
                     "crm.lead", [lead["id"]], conversation_key
                 )
                 if related_conversations:
                     lead["isLinked"] = True
- 
+
             partner_leads[partner.id] = lead_records
         return partner_leads
 
@@ -190,7 +213,7 @@ class ResPartner(models.Model):
                 (
                     "subtype_id",
                     "=",
-                    self.env.ref("frontapp_plugin.frontapp_conversation_link").id
+                    self.env.ref("frontapp_plugin.frontapp_conversation_link").id,
                 )
             )
         related_conversations = self.env["mail.message"].search(
@@ -203,7 +226,7 @@ class ResPartner(models.Model):
             (
                 "subtype_id",
                 "=",
-                self.env.ref("frontapp_plugin.frontapp_conversation_link").id
+                self.env.ref("frontapp_plugin.frontapp_conversation_link").id,
             )
         )
         if related_conversations and not ids:
@@ -269,11 +292,13 @@ class ResPartner(models.Model):
         if not frontapp_context:
             frontapp_context = {"conversation": {}}  # useful for local testing
         for partner in self:
-            self.env["crm.lead"].create({
-                "name": name,
-                "partner_id": partner.id,
-                "created_from_frontapp": True,
-            })
+            self.env["crm.lead"].create(
+                {
+                    "name": name,
+                    "partner_id": partner.id,
+                    "created_from_frontapp": True,
+                }
+            )
             partner.toggle_contact_link(True, frontapp_context)
         return self.search_from_frontapp([], False, frontapp_context)
 
