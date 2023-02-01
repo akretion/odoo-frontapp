@@ -452,12 +452,61 @@ odoo.define("web.frontapp", function (require) {
                 )
                 .then(function (contacts) {
                     app.dispatch("resetContacts");
-                    contacts.forEach((contact, i) => {
+                    contacts.forEach((contact) => {
                         app.dispatch("addContact", contact);
                     });
                 })
                 .guardedCatch(function () {
                     console.log("create contact KO!", this);
+                });
+        }
+
+        function loadContacts(contact_emails, frontappContext, search_param) {
+            // Console.log("loadContacts", contact_emails, frontappContext, search_param);
+            var app = window.odoo_app;
+            app.dispatch("ensureFrontappContext", frontappContext);
+            simple_ajax
+                .jsonRpc(
+                    "/web/dataset/call_kw/res.partner",
+                    "call",
+                    {
+                        model: "res.partner",
+                        method: "search_from_frontapp",
+                        args: [contact_emails, search_param, frontappContext],
+                        kwargs: {},
+                    },
+                    {headers: {}}
+                )
+                .then(function (contacts) {
+                    // Console.log("contact promise resolved!", contacts);
+                    app.dispatch("resetContacts");
+                    if (contacts.length > 0) {
+                        $("#info")[0].innerHTML = "";
+                        // $('#error')[0].innerHTML = "";
+                    } else {
+                        var search_result = "<p>No contact matching this conversation!";
+                        if (search_param) {
+                            search_result += " search_param: " + search_param + ";";
+                        }
+                        if (contact_emails) {
+                            search_result += " emails: " + contact_emails.join(", ");
+                        }
+                        search_result +=
+                            "</p><p>You can search for a contact (by name or email) and link it to the conversation.</p>" +
+                            "<p>Or you can also create a new Odoo contact or company.</p>";
+                        $("#info")[0].innerHTML = search_result;
+                    }
+
+                    contacts.forEach((contact, i) => {
+                        app.dispatch("addContact", contact);
+                    });
+                })
+                .guardedCatch(function (error) {
+                    if (error && error.message && error.message.code == 100) {
+                        showLoginForm();
+                    } else {
+                        console.log("contact search KO!", this, error);
+                    }
                 });
         }
 
@@ -500,9 +549,9 @@ odoo.define("web.frontapp", function (require) {
                 this.inputRef.el.value = "";
             }
 
-            createCompany(ev) {
+            createCompany() {
                 window.odoo_app.dispatch("ensureFrontappContext");
-                if (this.inputRef.el.value == "") {
+                if (this.inputRef.el.value === "") {
                     $("#error")[0].innerHTML =
                         "Company name cannot be blank! (write it in the search box)";
                     return;
@@ -591,55 +640,6 @@ odoo.define("web.frontapp", function (require) {
         function showLoginForm() {
             $("#login")[0].style.display = "block";
             $("#csrf_token")[0].value = odoo.csrf_token;
-        }
-
-        function loadContacts(contact_emails, frontappContext, search_param) {
-            // Console.log("loadContacts", contact_emails, frontappContext, search_param);
-            var app = window.odoo_app;
-            app.dispatch("ensureFrontappContext", frontappContext);
-            simple_ajax
-                .jsonRpc(
-                    "/web/dataset/call_kw/res.partner",
-                    "call",
-                    {
-                        model: "res.partner",
-                        method: "search_from_frontapp",
-                        args: [contact_emails, search_param, frontappContext],
-                        kwargs: {},
-                    },
-                    {headers: {}}
-                )
-                .then(function (contacts) {
-                    // Console.log("contact promise resolved!", contacts);
-                    app.dispatch("resetContacts");
-                    if (contacts.length > 0) {
-                        $("#info")[0].innerHTML = "";
-                        // $('#error')[0].innerHTML = "";
-                    } else {
-                        var search_result = "<p>No contact matching this conversation!";
-                        if (search_param) {
-                            search_result += " search_param: " + search_param + ";";
-                        }
-                        if (contact_emails) {
-                            search_result += " emails: " + contact_emails.join(", ");
-                        }
-                        search_result +=
-                            "</p><p>You can search for a contact (by name or email) and link it to the conversation.</p>" +
-                            "<p>Or you can also create a new Odoo contact or company.</p>";
-                        $("#info")[0].innerHTML = search_result;
-                    }
-
-                    contacts.forEach((contact, i) => {
-                        app.dispatch("addContact", contact);
-                    });
-                })
-                .guardedCatch(function (error) {
-                    if (error && error.message && error.message.code == 100) {
-                        showLoginForm();
-                    } else {
-                        console.log("contact search KO!", this, error);
-                    }
-                });
         }
 
         Front.contextUpdates.subscribe((context) => {
