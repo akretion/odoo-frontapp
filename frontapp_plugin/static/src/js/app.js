@@ -13,7 +13,6 @@ odoo.define("web.frontapp", function (require) {
         // Store
         // -------------------------------------------------------------------------
         const actions = {
-
             addContact({state}, contact) {
                 console.log("ADD CONTACT", contact);
                 if (contact) {
@@ -59,10 +58,10 @@ odoo.define("web.frontapp", function (require) {
 
             createOpportunity({state}, id) {
                 var contact = state.contacts.find((t) => t.id === id);
-                var input =  document.getElementById('opp_input_' + id);
+                var input = document.getElementById("opp_input_" + id);
                 var name = input.value;
                 if (name == "") {
-                    $('#error')[0].innerHTML = "Opportunity text cannot be blank!";
+                    $("#error")[0].innerHTML = "Opportunity text cannot be blank!";
                     return;
                 }
                 simple_ajax
@@ -72,18 +71,14 @@ odoo.define("web.frontapp", function (require) {
                         {
                             model: "res.partner",
                             method: "create_contact_opportunity",
-                            args: [
-                                [contact.id],
-                                name,
-                                state.frontappContext,
-                            ],
+                            args: [[contact.id], name, state.frontappContext],
                             kwargs: {context: {}},
                         },
                         {headers: {}}
                     )
                     .then(function (contacts) {
                         contact.isLinked = true;
-                        var input =  document.getElementById('opp_input_' + id);
+                        var input = document.getElementById("opp_input_" + id);
                         input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
@@ -100,9 +95,9 @@ odoo.define("web.frontapp", function (require) {
                 window.odoo_app.dispatch("ensureFrontappContext");
                 var opportunity = false;
                 state.contacts.forEach((contact, i) => {
-                                var opp = contact.opportunities.find((t) => t.id === id);
+                    var opp = contact.opportunities.find((t) => t.id === id);
                     if (opp) {
-                  opportunity = opp;
+                        opportunity = opp;
                     }
                 });
 
@@ -131,12 +126,12 @@ odoo.define("web.frontapp", function (require) {
             },
 
             createNote({state}, id) {
-                console.log("create note", id)
+                console.log("create note", id);
                 var contact = state.contacts.find((t) => t.id === id);
-                var input =  document.getElementById('note_input_' + id);
+                var input = document.getElementById("note_input_" + id);
                 var body = input.value;
                 if (body == "") {
-                    $('#error')[0].innerHTML = "Note body cannot be blank!";
+                    $("#error")[0].innerHTML = "Note body cannot be blank!";
                     return;
                 }
                 simple_ajax
@@ -146,18 +141,14 @@ odoo.define("web.frontapp", function (require) {
                         {
                             model: "res.partner",
                             method: "create_contact_note",
-                            args: [
-                                [contact.id],
-                                body,
-                                state.frontappContext,
-                            ],
+                            args: [[contact.id], body, state.frontappContext],
                             kwargs: {context: {}},
                         },
                         {headers: {}}
                     )
                     .then(function (contacts) {
                         contact.isLinked = true;
-                        var input =  document.getElementById('note_input_' + id);
+                        var input = document.getElementById("note_input_" + id);
                         input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
@@ -178,9 +169,16 @@ odoo.define("web.frontapp", function (require) {
                 }
                 if (window.location !== window.parent.location) {
                     frontappContext = state.frontappContext;
-                    if (!(frontappContext && frontappContext.conversation && frontappContext.conversation.subject !== undefined)) {
-                        var error = "Warning no FrontApp Conversion found!<br/>You might try select a conversation or try to refresh your browser using F5 if the problem persists."
-                        $('#error')[0].innerHTML = error;
+                    if (
+                        !(
+                            frontappContext &&
+                            frontappContext.conversation &&
+                            frontappContext.conversation.subject !== undefined
+                        )
+                    ) {
+                        var error =
+                            "Warning no FrontApp Conversion found!<br/>You might try select a conversation or try to refresh your browser using F5 if the problem persists.";
+                        $("#error")[0].innerHTML = error;
                         throw error;
                     }
                 }
@@ -454,27 +452,41 @@ odoo.define("web.frontapp", function (require) {
             createContact(ev) {
                 window.odoo_app.dispatch("ensureFrontappContext");
                 if (this.inputRef.el.value == "") {
-                    $('#error')[0].innerHTML = "Contact name cannot be blank! (write the name in the search box)";
+                    $("#error")[0].innerHTML =
+                        "Contact name cannot be blank! (write the name in the search box)";
                     return;
                 }
-                createOdooContact(this.state.frontappContext, this.inputRef.el.value, "person");
+                createOdooContact(
+                    this.state.frontappContext,
+                    this.inputRef.el.value,
+                    "person"
+                );
                 this.inputRef.el.value = "";
             }
 
             createCompany(ev) {
                 window.odoo_app.dispatch("ensureFrontappContext");
                 if (this.inputRef.el.value == "") {
-                    $('#error')[0].innerHTML = "Company name cannot be blank! (write it in the search box)";
+                    $("#error")[0].innerHTML =
+                        "Company name cannot be blank! (write it in the search box)";
                     return;
                 }
-                createOdooContact(this.state.frontappContext, this.inputRef.el.value, "company");
+                createOdooContact(
+                    this.state.frontappContext,
+                    this.inputRef.el.value,
+                    "company"
+                );
                 this.inputRef.el.value = "";
             }
 
             searchContact(ev) {
                 // 13 is keycode for ENTER
                 if (ev.keyCode === 13 || !ev.keyCode) {
-                    loadContacts([], this.state.frontappContext, this.inputRef.el.value);
+                    loadContacts(
+                        [],
+                        this.state.frontappContext,
+                        this.inputRef.el.value
+                    );
                     //ev.target.value = "";
                 }
             }
@@ -522,19 +534,25 @@ odoo.define("web.frontapp", function (require) {
                         ],
                         {}
                     );
-                } else if (window.delayed_search_contacts && window.delayed_search_context) {
+                } else if (
+                    window.delayed_search_contacts &&
+                    window.delayed_search_context
+                ) {
                     console.log("DELAYED SEARCH");
-                    loadContacts(window.delayed_search_contacts, window.delayed_search_context);
+                    loadContacts(
+                        window.delayed_search_contacts,
+                        window.delayed_search_context
+                    );
                     delete window.delayed_search_contacts;
                     delete window.delayed_search_context;
                 }
             });
         }
 
-	function showLoginForm() {
-	    $("#login")[0].style.display = "block";
-	    $("#csrf_token")[0].value = odoo.csrf_token;
-	}
+        function showLoginForm() {
+            $("#login")[0].style.display = "block";
+            $("#csrf_token")[0].value = odoo.csrf_token;
+        }
 
         function loadContacts(contact_emails, frontappContext, search_param) {
             //console.log("loadContacts", contact_emails, frontappContext, search_param);
@@ -556,19 +574,20 @@ odoo.define("web.frontapp", function (require) {
                     //console.log("contact promise resolved!", contacts);
                     app.dispatch("resetContacts");
                     if (contacts.length > 0) {
-                      $('#info')[0].innerHTML = "";
-                      //$('#error')[0].innerHTML = "";
+                        $("#info")[0].innerHTML = "";
+                        //$('#error')[0].innerHTML = "";
                     } else {
-                      var search_result = "<p>No contact matching this conversation!"
-                      if (search_param) {
-                        search_result += " search_param: " + search_param + ";"
-                      }
-                      if (contact_emails) {
-                        search_result += " emails: " + contact_emails.join(', ')
-                      }
-                      search_result += "</p><p>You can search for a contact (by name or email) and link it to the conversation.</p>"
-                                    + "<p>Or you can also create a new Odoo contact or company.</p>";
-                      $('#info')[0].innerHTML = search_result
+                        var search_result = "<p>No contact matching this conversation!";
+                        if (search_param) {
+                            search_result += " search_param: " + search_param + ";";
+                        }
+                        if (contact_emails) {
+                            search_result += " emails: " + contact_emails.join(", ");
+                        }
+                        search_result +=
+                            "</p><p>You can search for a contact (by name or email) and link it to the conversation.</p>" +
+                            "<p>Or you can also create a new Odoo contact or company.</p>";
+                        $("#info")[0].innerHTML = search_result;
                     }
 
                     contacts.forEach((contact, i) => {
@@ -576,11 +595,11 @@ odoo.define("web.frontapp", function (require) {
                     });
                 })
                 .guardedCatch(function (error) {
-		    if (error && error.message && error.message.code == 100) {
-			showLoginForm();
-		    } else {
-        		console.log("contact search KO!", this, error);
-		    }
+                    if (error && error.message && error.message.code == 100) {
+                        showLoginForm();
+                    } else {
+                        console.log("contact search KO!", this, error);
+                    }
                 });
         }
 
@@ -619,25 +638,25 @@ odoo.define("web.frontapp", function (require) {
                     // TODO  assignee can be undefined in https://app.frontapp.com/inboxes/teams/views/9523270/open/26322453318
                     var contacts = [];
                     if (context.conversation && context.conversation.assignee) {
-                        contacts.push(context.conversation.assignee.email)
+                        contacts.push(context.conversation.assignee.email);
                     }
                     if (context.conversation && context.conversation.recipient) {
-                        contacts.push(context.conversation.recipient.handle)
+                        contacts.push(context.conversation.recipient.handle);
                     }
-                    if ($('#search_input') && $('#search_input')[0]) {
-                        $('#search_input')[0].value="";
+                    if ($("#search_input") && $("#search_input")[0]) {
+                        $("#search_input")[0].value = "";
                     }
-                    if ($('#error') && $('#error')[0]) {
-                        $('#error')[0].innerHTML = "";
+                    if ($("#error") && $("#error")[0]) {
+                        $("#error")[0].innerHTML = "";
                     }
                     if (window.odoo_app) {
                         loadContacts(contacts, context);
                     } else {
-                        console.log("preparing delayed load")
+                        console.log("preparing delayed load");
                         window.delayed_search_contacts = contacts;
                         window.delayed_search_context = context;
                     }
-		    break;
+                    break;
                 case "multiConversations":
                     console.log(
                         "Multiple conversations selected",
