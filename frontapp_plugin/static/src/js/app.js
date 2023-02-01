@@ -497,12 +497,12 @@ odoo.define("web.frontapp", function (require) {
                         $("#info")[0].innerHTML = search_result;
                     }
 
-                    contacts.forEach((contact, i) => {
+                    contacts.forEach((contact) => {
                         app.dispatch("addContact", contact);
                     });
                 })
                 .guardedCatch(function (error) {
-                    if (error && error.message && error.message.code == 100) {
+                    if (error && error.message && error.message.code === 100) {
                         showLoginForm();
                     } else {
                         console.log("contact search KO!", this, error);
