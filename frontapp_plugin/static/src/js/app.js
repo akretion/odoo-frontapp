@@ -213,7 +213,11 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Note extends Component {
-            dispatch = useDispatch();
+            // eslint-disable-next-line no-unused-vars
+            constructor(parent, component, props) {
+                super(...arguments);
+                this.dispatch = useDispatch();
+            }
         }
         Note.template = NOTE_TEMPLATE;
         Note.props = ["note"];
@@ -235,7 +239,11 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Opportunity extends Component {
-            dispatch = useDispatch();
+            // eslint-disable-next-line no-unused-vars
+            constructor(parent, component, props) {
+                super(...arguments);
+                this.dispatch = useDispatch();
+            }
         }
         Opportunity.template = OPPORTUNITY_TEMPLATE;
         Opportunity.props = ["opportunity"];
@@ -357,7 +365,11 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Contact extends Component {
-            dispatch = useDispatch();
+            // eslint-disable-next-line no-unused-vars
+            constructor(parent, component, props) {
+                super(...arguments);
+                this.dispatch = useDispatch();
+            }
         }
         Contact.template = CONTACT_TEMPLATE;
         Contact.props = ["contact"];
@@ -425,11 +437,15 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class App extends Component {
-            inputRef = useRef("add-input");
-            contacts = useStore((state) => state.contacts);
-            frontappContext = useStore((state) => state.frontappContext);
-            filter = useState({value: "all"});
-            dispatch = useDispatch();
+            // eslint-disable-next-line no-unused-vars
+            constructor(parent, component, props) {
+                super(...arguments);
+                this.inputRef = useRef("add-input");
+                this.contacts = useStore((state) => state.contacts);
+                this.frontappContext = useStore((state) => state.frontappContext);
+                this.filter = useState({value: "all"});
+                this.dispatch = useDispatch();
+            }
 
             mounted() {
                 this.inputRef.el.focus();
@@ -482,7 +498,7 @@ odoo.define("web.frontapp", function (require) {
                         this.state.frontappContext,
                         this.inputRef.el.value
                     );
-                    //ev.target.value = "";
+                    // Ev.target.value = "";
                 }
             }
 
@@ -501,7 +517,7 @@ odoo.define("web.frontapp", function (require) {
         }
         App.template = APP_TEMPLATE;
         App.components = {Contact};
-        //App.props = ["name"];
+        // App.props = ["name"];
 
         // -------------------------------------------------------------------------
         // Setup code
@@ -522,7 +538,7 @@ odoo.define("web.frontapp", function (require) {
             mount(App, {target: document.body, env}).then((app) => {
                 window.odoo_app = app;
                 if (window.location == window.parent.location) {
-                    // demo data for localhost testing:
+                    // Demo data for localhost testing:
                     loadContacts(
                         [
                             "hello@dualsun.com",
@@ -553,7 +569,7 @@ odoo.define("web.frontapp", function (require) {
         }
 
         function loadContacts(contact_emails, frontappContext, search_param) {
-            //console.log("loadContacts", contact_emails, frontappContext, search_param);
+            // Console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
             app.dispatch("ensureFrontappContext", frontappContext);
             simple_ajax
@@ -569,11 +585,11 @@ odoo.define("web.frontapp", function (require) {
                     {headers: {}}
                 )
                 .then(function (contacts) {
-                    //console.log("contact promise resolved!", contacts);
+                    // Console.log("contact promise resolved!", contacts);
                     app.dispatch("resetContacts");
                     if (contacts.length > 0) {
                         $("#info")[0].innerHTML = "";
-                        //$('#error')[0].innerHTML = "";
+                        // $('#error')[0].innerHTML = "";
                     } else {
                         var search_result = "<p>No contact matching this conversation!";
                         if (search_param) {
