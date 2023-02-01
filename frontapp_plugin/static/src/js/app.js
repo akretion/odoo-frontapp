@@ -117,7 +117,7 @@ odoo.define("web.frontapp", function (require) {
                         },
                         {headers: {}}
                     )
-                    .then(function (result) {
+                    .then(function () {
                         opportunity.isLinked = !opportunity.isLinked;
                     })
                     .guardedCatch(function () {
@@ -130,7 +130,7 @@ odoo.define("web.frontapp", function (require) {
                 var contact = state.contacts.find((t) => t.id === id);
                 var input = document.getElementById("note_input_" + id);
                 var body = input.value;
-                if (body == "") {
+                if (body === "") {
                     $("#error")[0].innerHTML = "Note body cannot be blank!";
                     return;
                 }
@@ -148,12 +148,12 @@ odoo.define("web.frontapp", function (require) {
                     )
                     .then(function (contacts) {
                         contact.isLinked = true;
-                        var input = document.getElementById("note_input_" + id);
+                        input = document.getElementById("note_input_" + id);
                         input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
-                        contacts.forEach((contact, i) => {
-                            app.dispatch("addContact", contact);
+                        contacts.forEach((contact_item) => {
+                            app.dispatch("addContact", contact_item);
                         });
                     })
                     .guardedCatch(function () {
