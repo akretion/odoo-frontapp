@@ -1,8 +1,4 @@
-# Node JS
-*/static/node_modules
-
 # Byte-compiled / optimized / DLL files
-# de
 __pycache__/
 *.py[cod]
 /.venv
@@ -19,7 +15,6 @@ build/
 develop-eggs/
 dist/
 eggs/
-lib/
 lib64/
 parts/
 sdist/
