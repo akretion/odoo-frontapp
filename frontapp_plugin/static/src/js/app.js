@@ -597,7 +597,6 @@ odoo.define("web.frontapp", function (require) {
         // Setup code
         // -------------------------------------------------------------------------
         function makeStore() {
-            const localState = window.localStorage.getItem("frontapp-odoo");
             const state = initialState;
             const store = new Store({state, actions});
             store.on("update", null, () => {
@@ -611,7 +610,7 @@ odoo.define("web.frontapp", function (require) {
             const env = {store: makeStore()};
             mount(App, {target: document.body, env}).then((app) => {
                 window.odoo_app = app;
-                if (window.location == window.parent.location) {
+                if (window.location === window.parent.location) {
                     // Demo data for localhost testing:
                     loadContacts(
                         [
@@ -642,7 +641,7 @@ odoo.define("web.frontapp", function (require) {
             $("#csrf_token")[0].value = odoo.csrf_token;
         }
 
-        Front.contextUpdates.subscribe((context) => {
+        window.Front.contextUpdates.subscribe((context) => {
             switch (context.type) {
                 case "noConversation":
                     console.log("No conversation selected");
