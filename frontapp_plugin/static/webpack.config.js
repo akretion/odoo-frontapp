@@ -1,3 +1,4 @@
+/* eslint no-undef: "off", no-path-concat: "off" */
 module.exports = {
     entry: "./src/js/frontapp_es6_bridge.js",
     output: {
