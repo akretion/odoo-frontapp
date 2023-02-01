@@ -168,7 +168,7 @@ odoo.define("web.frontapp", function (require) {
                     state.frontappContext = frontappContext;
                 }
                 if (window.location !== window.parent.location) {
-                    frontappContext = state.frontappContext;
+                    this.frontappContext = state.frontappContext;
                     if (
                         !(
                             frontappContext &&
