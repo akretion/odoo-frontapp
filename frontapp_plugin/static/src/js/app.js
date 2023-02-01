@@ -213,11 +213,10 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Note extends Component {
-            static template = NOTE_TEMPLATE;
-            static props = ["note"];
             dispatch = useDispatch();
         }
-
+        Note.template = NOTE_TEMPLATE;
+        Note.props = ["note"];
         // -------------------------------------------------------------------------
         // Opportunity Component
         // -------------------------------------------------------------------------
@@ -236,10 +235,10 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Opportunity extends Component {
-            static template = OPPORTUNITY_TEMPLATE;
-            static props = ["opportunity"];
             dispatch = useDispatch();
         }
+        Opportunity.template = OPPORTUNITY_TEMPLATE;
+        Opportunity.props = ["opportunity"];
 
         // -------------------------------------------------------------------------
         // Contact Component
@@ -358,11 +357,11 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class Contact extends Component {
-            static template = CONTACT_TEMPLATE;
-            static props = ["contact"];
-            static components = {Opportunity, Note};
-            dispatch = useDispatch();
+           dispatch = useDispatch();
         }
+        Contact.template = CONTACT_TEMPLATE;
+        Contact.props = ["contact"];
+        Contact.components = {Opportunity, Note};
 
         // -------------------------------------------------------------------------
         // App Component
@@ -426,10 +425,6 @@ odoo.define("web.frontapp", function (require) {
     </div>`;
 
         class App extends Component {
-            static template = APP_TEMPLATE;
-            static components = {Contact};
-            //static props = ["name"];
-
             inputRef = useRef("add-input");
             contacts = useStore((state) => state.contacts);
             frontappContext = useStore((state) => state.frontappContext);
@@ -504,6 +499,10 @@ odoo.define("web.frontapp", function (require) {
                 this.filter.value = filter;
             }
         }
+        App.template = APP_TEMPLATE;
+        App.components = {Contact};
+        //App.props = ["name"];
+
 
         // -------------------------------------------------------------------------
         // Setup code
