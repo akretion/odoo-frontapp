@@ -82,8 +82,8 @@ odoo.define("web.frontapp", function (require) {
                         input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
-                        contacts.forEach((contact, i) => {
-                            app.dispatch("addContact", contact);
+                        contacts.forEach((contact_item) => {
+                            app.dispatch("addContact", contact_item);
                         });
                     })
                     .guardedCatch(function () {
@@ -94,7 +94,7 @@ odoo.define("web.frontapp", function (require) {
             toggleOpportunityLink({state}, id) {
                 window.odoo_app.dispatch("ensureFrontappContext");
                 var opportunity = false;
-                state.contacts.forEach((contact, i) => {
+                state.contacts.forEach((contact) => {
                     var opp = contact.opportunities.find((t) => t.id === id);
                     if (opp) {
                         opportunity = opp;
