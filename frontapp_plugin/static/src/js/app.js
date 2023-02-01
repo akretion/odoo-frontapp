@@ -461,6 +461,11 @@ odoo.define("web.frontapp", function (require) {
                 });
         }
 
+        function showLoginForm() {
+            $("#login")[0].style.display = "block";
+            $("#csrf_token")[0].value = odoo.csrf_token;
+        }
+
         function loadContacts(contact_emails, frontappContext, search_param) {
             // Console.log("loadContacts", contact_emails, frontappContext, search_param);
             var app = window.odoo_app;
@@ -634,11 +639,6 @@ odoo.define("web.frontapp", function (require) {
                     delete window.delayed_search_context;
                 }
             });
-        }
-
-        function showLoginForm() {
-            $("#login")[0].style.display = "block";
-            $("#csrf_token")[0].value = odoo.csrf_token;
         }
 
         window.Front.contextUpdates.subscribe((context) => {
