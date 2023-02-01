@@ -436,6 +436,31 @@ odoo.define("web.frontapp", function (require) {
         </div>
     </div>`;
 
+        function createOdooContact(frontappContext, name, company_type) {
+            var app = window.odoo_app;
+            simple_ajax
+                .jsonRpc(
+                    "/web/dataset/call_kw/res.partner",
+                    "call",
+                    {
+                        model: "res.partner",
+                        method: "create_contact_from_frontapp",
+                        args: [name, frontappContext, company_type],
+                        kwargs: {},
+                    },
+                    {headers: {}}
+                )
+                .then(function (contacts) {
+                    app.dispatch("resetContacts");
+                    contacts.forEach((contact, i) => {
+                        app.dispatch("addContact", contact);
+                    });
+                })
+                .guardedCatch(function () {
+                    console.log("create contact KO!", this);
+                });
+        }
+
         class App extends Component {
             // eslint-disable-next-line no-unused-vars
             constructor(parent, component, props) {
@@ -460,9 +485,9 @@ odoo.define("web.frontapp", function (require) {
                 }
             }
 
-            createContact(ev) {
+            createContact() {
                 window.odoo_app.dispatch("ensureFrontappContext");
-                if (this.inputRef.el.value == "") {
+                if (this.inputRef.el.value === "") {
                     $("#error")[0].innerHTML =
                         "Contact name cannot be blank! (write the name in the search box)";
                     return;
@@ -614,31 +639,6 @@ odoo.define("web.frontapp", function (require) {
                     } else {
                         console.log("contact search KO!", this, error);
                     }
-                });
-        }
-
-        function createOdooContact(frontappContext, name, company_type) {
-            var app = window.odoo_app;
-            simple_ajax
-                .jsonRpc(
-                    "/web/dataset/call_kw/res.partner",
-                    "call",
-                    {
-                        model: "res.partner",
-                        method: "create_contact_from_frontapp",
-                        args: [name, frontappContext, company_type],
-                        kwargs: {},
-                    },
-                    {headers: {}}
-                )
-                .then(function (contacts) {
-                    app.dispatch("resetContacts");
-                    contacts.forEach((contact, i) => {
-                        app.dispatch("addContact", contact);
-                    });
-                })
-                .guardedCatch(function () {
-                    console.log("create contact KO!", this);
                 });
         }
 
