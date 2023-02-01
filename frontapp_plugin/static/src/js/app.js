@@ -39,7 +39,7 @@ odoo.define("web.frontapp", function (require) {
                         },
                         {headers: {}}
                     )
-                    .then(function (result) {
+                    .then(function () {
                         contact.isLinked = !contact.isLinked;
                     })
                     .guardedCatch(function () {
@@ -52,7 +52,7 @@ odoo.define("web.frontapp", function (require) {
                 state.contacts.splice(index, 1);
             },
 
-            resetContacts({state}, id) {
+            resetContacts({state}) {
                 state.contacts = [];
             },
 
@@ -60,7 +60,7 @@ odoo.define("web.frontapp", function (require) {
                 var contact = state.contacts.find((t) => t.id === id);
                 var input = document.getElementById("opp_input_" + id);
                 var name = input.value;
-                if (name == "") {
+                if (name === "") {
                     $("#error")[0].innerHTML = "Opportunity text cannot be blank!";
                     return;
                 }
@@ -78,7 +78,7 @@ odoo.define("web.frontapp", function (require) {
                     )
                     .then(function (contacts) {
                         contact.isLinked = true;
-                        var input = document.getElementById("opp_input_" + id);
+                        input = document.getElementById("opp_input_" + id);
                         input.value = "";
                         var app = window.odoo_app;
                         app.dispatch("resetContacts");
