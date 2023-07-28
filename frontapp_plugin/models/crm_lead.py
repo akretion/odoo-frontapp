@@ -42,4 +42,3 @@ class MailMessage(models.Model):
             else:
                 existing_links.unlink()
         return True
-

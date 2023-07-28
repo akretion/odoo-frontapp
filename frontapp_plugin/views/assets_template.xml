@@ -93,7 +93,11 @@
         inherit_id="web.assets_backend"
     >
       <xpath expr="." position="inside">
-          <link rel="stylesheet" type="text/css" href="/frontapp_plugin/static/src/css/backend.css" />
+          <link
+                rel="stylesheet"
+                type="text/css"
+                href="/frontapp_plugin/static/src/css/backend.css"
+            />
       </xpath>
   </template>
 </odoo>
