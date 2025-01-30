@@ -17,7 +17,11 @@ Inspired from the FrontApp demo plugin but it's developped using Odoo OWL framew
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[frontapp_plugin](frontapp_plugin/) | 14.0.1.0.0 | [![rvalyi](https://github.com/rvalyi.png?size=30px)](https://github.com/rvalyi) | Plugin for FrontApp CRM
 
 [//]: # (end addons)
 
