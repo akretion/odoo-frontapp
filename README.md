@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[frontapp_plugin](frontapp_plugin/) | 14.0.1.0.0 | [![rvalyi](https://github.com/rvalyi.png?size=30px)](https://github.com/rvalyi) | Plugin for FrontApp CRM
+[frontapp_plugin](frontapp_plugin/) | 14.0.1.0.0 | <a href='https://github.com/rvalyi'><img src='https://github.com/rvalyi.png' width='32' height='32' style='border-radius:50%;' alt='rvalyi'/></a> | Plugin for FrontApp CRM
 
 [//]: # (end addons)
 
